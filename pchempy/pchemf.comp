@@ -1,0 +1,2 @@
+#f2py -c -m model Fortran/converge_model.f90 Fortran/diffusion.f90 Fortran/chemistry.f90 Fortran/mars_chemistry.f90 Fortran/photolysis_mod.f90 Fortran/photolysis.f90 -llapack --fcompiler='intelem'
+f2py -c -m pchemf Fortran/converge_model.f90 Fortran/diffusion.f90 Fortran/chemistry.f90 Fortran/mars_chemistry.f90 Fortran/photolysis_mod.f90 Fortran/photolysis.f90 -llapack --fcompiler='gfortran' --opt='-fcheck=bounds'

@@ -2,6 +2,8 @@ module photolysis_mod
 
   implicit none
 
+  include 'datapath.h'
+
 ! photolysis
 
   integer, save :: nphot = 15             ! number of photolysis
@@ -51,7 +53,7 @@ module photolysis_mod
 contains
 
 subroutine init_photolysis
-
+ 
 ! define where the files are stored
   datafile1='/home/stem/ja22256/Documents/Projects/PlanetaryScience/'
   datafile2='ModChem/c13_mcd_ronsebrock/photolysis_fortran/datafile/'
@@ -420,7 +422,9 @@ end subroutine init_photolysis
 
       if (msun == 18) THEN
 
-         fil = trim(datafile)//'solar_fluxes/atlas3_thuillier_tuv.txt'
+         fil = trim(datapath)//'SolarSpectrum/atlas3_thuillier_tuv.txt'
+         print*,fil
+         !fil = trim(datafile)//'solar_fluxes/atlas3_thuillier_tuv.txt'
          !print*, 'solar flux : ', fil
          open(kin, file=fil, status='old', iostat=ierr)
 

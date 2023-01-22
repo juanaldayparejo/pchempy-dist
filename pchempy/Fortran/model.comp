@@ -1,2 +1,0 @@
-#f2py -c -m model converge_model.f90 diffusion.f90 chemistry.f90 mars_chemistry.f90 photolysis_mod.f90 photolysis.f90 -llapack --fcompiler='intelem'
-f2py -c -m model converge_model.f90 diffusion.f90 chemistry.f90 mars_chemistry.f90 photolysis_mod.f90 photolysis.f90 -llapack --fcompiler='gfortran'

@@ -1356,13 +1356,13 @@ MODULE mars_chemistry
             
             !chemical activation
             
-            kint = 1.85e-13*exp(-65./t(ilev))
+            kint = 1.85e-13*exp(-65./t(ilay))
             
             kca = kint*(1. - kf/kinf)
             
             !total : association + chemical activation
             
-            e001(ilev) = kf + kca
+            e001(ilay) = kf + kca
             
         end do
 
