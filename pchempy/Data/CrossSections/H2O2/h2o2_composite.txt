@@ -1,8 +1,8 @@
-#6 46
-#sections efficaces de H2O2:
-#1) jusqu'a 185 nm: Schuergers and Welge, Z. Naturforsch. 23a (1968) 1508
-#2) de 190 nm a 350 nm: JPL 1997 (depend de T a partir de 260 nm), voir JPL 1997
-#===============================================================================
+6 46
+sections efficaces de H2O2:
+1) jusqu'a 185 nm: Schuergers and Welge, Z. Naturforsch. 23a (1968) 1508
+2) de 190 nm a 350 nm: JPL 1997 (depend de T a partir de 260 nm), voir JPL 1997
+===============================================================================
  125.00   1.000E-17
  130.00   9.690E-18
  135.00   8.130E-18

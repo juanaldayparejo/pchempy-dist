@@ -1,3 +1,20 @@
+sections efficaces de HDO a 295K version 26 octobre 2020
+
+125.00-139.98:
+
+B.-M. Cheng, C.-Y. Chung, M. Bahou, Y.-P. Lee, L. C. Lee, R. van Harrevelt, 
+and M. C. van Hemert, "Quantitative spectroscopic and theoretical study 
+of the optical absorption spectra of H2O, HOD, and D2O in 125-145 nm region",
+J. Chem. Phys. 120, 224-229 (2004); DOI: 10.1063/1.1630304
+
+140.00-195.00:
+
+C.-Y. Chung, E. P. Chew, B.-M. Cheng, M. Bahou, and Y.-P. Lee,
+"Temperature dependence of absorption cross-section of H2O, HDO,
+and D2O in the spectral region 140-193 nm",
+Nucl. Instr. Meth. Phys. Res. A 467-468, 1572-1576 (2001).
+
+===================================================================================
 125.00	7.290e-18
 125.02	7.214e-18
 125.04	7.362e-18

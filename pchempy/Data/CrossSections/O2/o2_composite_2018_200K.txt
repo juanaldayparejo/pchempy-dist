@@ -1,3 +1,25 @@
+fichier composite a 200K
+===========================================================================
+0-108.7
+Francisco
+108.75-139.00
+S. Ogawa and M. Ogawa, Absorption cross sections of O2 (a 1g) and O2(X 3g-) 
+in the region from 1087 to 1700 Å, Can. J. Phys. 53, 1845-1852 (1975)
+121.40-121.90
+B.R. Lewis, I.M. Vardavas, and J.H. Carver,
+The aeronomic dissociation of water vapor by solar H Lyman  radiation,
+J. Geophys. Res. 88, 4935-4940 (1983).
+140.03-174.00
+S.T. Gibson, H.P.F. Gies, A.J. Blake, D.G. McCoy, and P.J. Rogers, Temperature dependence in 
+the Schumann-Runge photoabsorption continuum of oxygen, J. Quant. Spectrosc. Radiat. Transfer 30,
+385-393 (1983).
+175.4386-203.9984
+Minschwaner, J. Geophys. Res., 97, 10103-10108 (1992)
+204.0-240.0
+Yoshino, Planet. Space Sci., 36, 1469-1475 (1988)
+241.0-245.0
+Fally et al., J. Mol. Spectrosc. 204, 10-20 (2000)
+===========================================================================
     0.1      0.24050E-19
     0.2      0.48090E-19
     0.3      0.72140E-19

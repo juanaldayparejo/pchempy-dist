@@ -55,9 +55,9 @@ contains
 subroutine init_photolysis
  
 ! define where the files are stored
-  datafile1='/home/stem/ja22256/Documents/Projects/PlanetaryScience/'
-  datafile2='ModChem/c13_mcd_ronsebrock/photolysis_fortran/datafile/'
-  datafile=trim(datafile1)//trim(datafile2)
+  !datafile1='/home/stem/ja22256/Documents/Projects/PlanetaryScience/'
+  !datafile2='ModChem/c13_mcd_ronsebrock/photolysis_fortran/datafile/'
+  !datafile=trim(datafile1)//trim(datafile2)
 
 ! initialise on-line photolysis
 
@@ -423,19 +423,10 @@ end subroutine init_photolysis
       if (msun == 18) THEN
 
          fil = trim(datapath)//'SolarSpectrum/atlas3_thuillier_tuv.txt'
-         print*,fil
-         !fil = trim(datafile)//'solar_fluxes/atlas3_thuillier_tuv.txt'
-         !print*, 'solar flux : ', fil
          open(kin, file=fil, status='old', iostat=ierr)
 
          if (ierr /= 0) THEN
             write(*,*)'cant find solar flux : ', fil
-            write(*,*)'It should be in :', trim(datafile),'/solar_fluxes'
-            write(*,*)'1) You can change this directory address in '
-            write(*,*)'   callphys.def with datadir=/path/to/dir'
-            write(*,*)'2) If necessary, /solar fluxes (and other datafiles)'
-            write(*,*)'   can be obtained online on:'
-            write(*,*)' http://www.lmd.jussieu.fr/~lmdz/planets/mars/datadir'
             stop
          end if
 
@@ -797,8 +788,8 @@ end subroutine init_photolysis
       
 !     195K:
 
-      !fil = 'datafile/cross_sections/co2_euv_uv_2018_195k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso1_euv_uv_195k.txt'
+      !fil = 'trim(datapath)//'CrossSections/CO2/co2_euv_uv_2018_195k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso1_euv_uv_195k.txt'
       !print*, 'section efficace CO2 195K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -827,8 +818,7 @@ end subroutine init_photolysis
 
 !     295K:
 
-      !fil = 'datafile/cross_sections/co2_euv_uv_2018_295k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso1_euv_uv_295k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso1_euv_uv_295k.txt'
       !print*, 'section efficace CO2 295K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -857,8 +847,7 @@ end subroutine init_photolysis
 
 !     370K:
 
-      !fil = 'datafile/cross_sections/co2_euv_uv_2018_370k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso1_euv_uv_370k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso1_euv_uv_370k.txt'
       !print*, 'section efficace CO2 370K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -886,8 +875,7 @@ end subroutine init_photolysis
       END DO
 
 !     photodissociation yield:
-
-      fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/CO2/efdis_co2-o2_schunkandnagy2000.txt'
       !print*, 'photodissociation yield CO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -995,7 +983,7 @@ end subroutine init_photolysis
 !     195K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_195k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso2_euv_uv_195k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso2_euv_uv_195k.txt'
       !print*, 'section efficace CO2 195K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1025,7 +1013,7 @@ end subroutine init_photolysis
 !     295K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_295k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso2_euv_uv_295k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso2_euv_uv_295k.txt'
       !print*, 'section efficace CO2 295K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1055,7 +1043,7 @@ end subroutine init_photolysis
 !     370K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_370k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso2_euv_uv_370k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso2_euv_uv_370k.txt'
       !print*, 'section efficace CO2 370K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1084,7 +1072,7 @@ end subroutine init_photolysis
 
 !     photodissociation yield:
 
-      fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/CO2/efdis_co2-o2_schunkandnagy2000.txt'
       !print*, 'photodissociation yield CO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1190,9 +1178,7 @@ end subroutine init_photolysis
       n3 = 10110
       
 !     195K:
-
-      !fil = 'datafile/cross_sections/co2_euv_uv_2018_195k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso3_euv_uv_195k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso3_euv_uv_195k.txt'
       !print*, 'section efficace CO2 195K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1222,7 +1208,7 @@ end subroutine init_photolysis
 !     295K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_295k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso3_euv_uv_295k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso3_euv_uv_295k.txt'
       !print*, 'section efficace CO2 295K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1251,8 +1237,7 @@ end subroutine init_photolysis
 
 !     370K:
 
-      !fil = 'datafile/cross_sections/co2_euv_uv_2018_370k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso3_euv_uv_370k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso3_euv_uv_370k.txt'
       !print*, 'section efficace CO2 370K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1281,7 +1266,7 @@ end subroutine init_photolysis
 
 !     photodissociation yield:
 
-      fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/CO2/efdis_co2-o2_schunkandnagy2000.txt'
       !print*, 'photodissociation yield CO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1389,7 +1374,8 @@ end subroutine init_photolysis
 !     195K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_195k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_195k.txt'
+      !fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_195k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso4_euv_uv_195k.txt'
       !print*, 'section efficace CO2 195K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1419,7 +1405,8 @@ end subroutine init_photolysis
 !     295K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_295k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_295k.txt'
+      !fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_295k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso4_euv_uv_295k.txt'
       !print*, 'section efficace CO2 295K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1449,7 +1436,8 @@ end subroutine init_photolysis
 !     370K:
 
       !fil = 'datafile/cross_sections/co2_euv_uv_2018_370k.txt'
-      fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_370k.txt'
+      !fil = trim(datafile)//'cross_sections/co2_iso4_euv_uv_370k.txt'
+      fil = trim(datapath)//'CrossSections/CO2/co2_iso4_euv_uv_370k.txt'
       !print*, 'section efficace CO2 370K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1478,7 +1466,8 @@ end subroutine init_photolysis
 
 !     photodissociation yield:
 
-      fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      !fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/CO2/efdis_co2-o2_schunkandnagy2000.txt'
       !print*, 'photodissociation yield CO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1565,18 +1554,14 @@ end subroutine init_photolysis
       nhead = 22
       n     = 17434
 
-      fil = trim(datafile)//'cross_sections/o2_composite_2018_150K.txt'
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_150K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_150K.txt'
+      
       !print*, 'section efficace O2 150K: ', fil
       open(kin, file=fil, status='old', iostat=ierr)
 
       if (ierr /= 0) THEN
          write(*,*)'cant find O2 cross-sections : ', fil
-         write(*,*)'It should be in :', trim(datafile),'/cross_sections'
-         write(*,*)'1) You can change this directory address in '
-         write(*,*)'   callphys.def with datadir=/path/to/dir'
-         write(*,*)'2) If necessary, /cross_sections (and other datafiles)'
-         write(*,*)'   can be obtained online on:'
-         write(*,*)' http://www.lmd.jussieu.fr/~lmdz/planets/mars/datadir'
          stop
       end if
 
@@ -1600,7 +1585,8 @@ end subroutine init_photolysis
          STOP
       ENDIF
 
-      fil = trim(datafile)//'cross_sections/o2_composite_2018_200K.txt'
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_200K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_200K.txt'
       !print*, 'section efficace O2 200K: ', fil
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
@@ -1624,7 +1610,8 @@ end subroutine init_photolysis
          STOP
       ENDIF
 
-      fil = trim(datafile)//'cross_sections/o2_composite_2018_250K.txt'
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_250K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_250K.txt'
       !print*, 'section efficace O2 250K: ', fil
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
@@ -1648,7 +1635,8 @@ end subroutine init_photolysis
          STOP
       ENDIF
 
-      fil = trim(datafile)//'cross_sections/o2_composite_2018_300K.txt'
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_300K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_300K.txt'
       !print*, 'section efficace O2 300K: ', fil
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
@@ -1674,7 +1662,8 @@ end subroutine init_photolysis
 
 !     photodissociation yield
 
-      fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      !fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/O2/efdis_co2-o2_schunkandnagy2000.txt'
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
       do i = 1,11
@@ -1754,7 +1743,8 @@ end subroutine init_photolysis
 
 !     JPL 2006 218 K
 
-      fil = trim(datafile)//'cross_sections/o3_cross-sections_jpl_2006_218K.txt'
+      !fil = trim(datafile)//'cross_sections/o3_cross-sections_jpl_2006_218K.txt'
+      fil = trim(datapath)//'CrossSections/O3/o3_cross-sections_jpl_2006_218K.txt'
       !print*, 'section efficace O3 218K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1781,7 +1771,8 @@ end subroutine init_photolysis
 
 !     JPL 2006 298 K
 
-      fil = trim(datafile)//'cross_sections/o3_cross-sections_jpl_2006_298K.txt'
+      !fil = trim(datafile)//'cross_sections/o3_cross-sections_jpl_2006_298K.txt'
+      fil = trim(datapath)//'CrossSections/O3/o3_cross-sections_jpl_2006_298K.txt'
       !print*, 'section efficace O3 298K: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1854,7 +1845,7 @@ end subroutine init_photolysis
 
       kin = 10
 
-      fil = trim(datafile)//'cross_sections/h2o_composite_250K.txt'
+      fil = trim(datapath)//'CrossSections/H2O/h2o_composite_250K.txt'
       !print*, 'section efficace H2O: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -1927,7 +1918,8 @@ end subroutine init_photolysis
 
       kin = 10
 
-      fil = trim(datafile)//'cross_sections/hdo_composite_295K.txt'
+      !fil = trim(datafile)//'cross_sections/hdo_composite_295K.txt'
+      fil = trim(datapath)//'CrossSections/H2O/hdo_composite_295K.txt'
       !print*, 'section efficace HDO: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -2001,7 +1993,8 @@ end subroutine init_photolysis
 
 !     read cross-sections
 
-      fil = trim(datafile)//'cross_sections/h2o2_composite.txt'
+      !fil = trim(datafile)//'cross_sections/h2o2_composite.txt'
+      fil = trim(datapath)//'CrossSections/H2O2/h2o2_composite.txt'
       !print*, 'section efficace H2O2: ', fil
 
       OPEN(kin,FILE=fil,STATUS='OLD')
@@ -2072,7 +2065,8 @@ end subroutine init_photolysis
 
 !*** cross sections from Sander et al. [2003]
 
-      fil = trim(datafile)//'cross_sections/ho2_jpl2003.txt'
+      !fil = trim(datafile)//'cross_sections/ho2_jpl2003.txt'
+      fil = trim(datapath)//'CrossSections/HO2/ho2_jpl2003.txt'
       !print*, 'section efficace HO2: ', fil
 
       OPEN(kin,FILE=fil,STATUS='OLD')
@@ -2139,7 +2133,8 @@ end subroutine init_photolysis
 
 !     h2 cross sections
 
-      fil = trim(datafile)//'cross_sections/h2secef.txt'
+      !fil = trim(datafile)//'cross_sections/h2secef.txt'
+      fil = trim(datapath)//'CrossSections/H2/h2secef.txt'
       !print*, 'section efficace H2: ', fil
 
       OPEN(kin,FILE=fil,STATUS='OLD')
@@ -2164,7 +2159,8 @@ end subroutine init_photolysis
 
 !     photodissociation yield
 
-      fil = trim(datafile)//'cross_sections/h2_ionef_schunknagy2000.txt'
+      !fil = trim(datafile)//'cross_sections/h2_ionef_schunknagy2000.txt'
+      fil = trim(datapath)//'CrossSections/H2/h2_ionef_schunknagy2000.txt'
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
       n = 19
@@ -2243,7 +2239,8 @@ end subroutine init_photolysis
 
 !  Jenouvrier 1996 + Vandaele 1998 (JPL 2006)
 
-      fil = trim(datafile)//'cross_sections/no2_xs_jenouvrier.txt'
+      !fil = trim(datafile)//'cross_sections/no2_xs_jenouvrier.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_jenouvrier.txt'
       !print*, 'section efficace NO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,status='old')
@@ -2261,7 +2258,8 @@ end subroutine init_photolysis
       CALL addpnt(x1,y1,kdata,n1,           1.e+38, 0.)
       CALL inter2(nw,wl,yg1,n1,x1,y1,ierr)
 
-      fil = trim(datafile)//'cross_sections/no2_xs_vandaele_294K.txt'
+      !fil = trim(datafile)//'cross_sections/no2_xs_vandaele_294K.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_vandaele_294K.txt'
       !print*, 'section efficace NO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,status='old')
@@ -2279,7 +2277,8 @@ end subroutine init_photolysis
       CALL addpnt(x2,y2,kdata,n2,           1.e+38, 0.)
       CALL inter2(nw,wl,yg2,n2,x2,y2,ierr)
 
-      fil = trim(datafile)//'cross_sections/no2_xs_vandaele_220K.txt'
+      !fil = trim(datafile)//'cross_sections/no2_xs_vandaele_220K.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_vandaele_220K.txt'
       !print*, 'section efficace NO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,status='old')
@@ -2305,7 +2304,8 @@ end subroutine init_photolysis
 
 !     photodissociation efficiency from jpl 2006
 
-      fil = trim(datafile)//'cross_sections/no2_yield_jpl2006.txt'
+      !fil = trim(datafile)//'cross_sections/no2_yield_jpl2006.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_yield_jpl2006.txt'
       !print*, 'quantum yield NO2: ', fil
 
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
@@ -2391,7 +2391,8 @@ end subroutine init_photolysis
 
 !     no cross-sections
 
-      fil = trim(datafile)//'cross_sections/no_xs_francisco.txt'
+      !fil = trim(datafile)//'cross_sections/no_xs_francisco.txt'
+      fil = trim(datapath)//'CrossSections/NO/no_xs_francisco.txt'
       !print*, 'section efficace NO: ', fil
       OPEN(kin,FILE=fil,STATUS='OLD')
 
@@ -2414,7 +2415,8 @@ end subroutine init_photolysis
 
 !     photodissociation yield
 
-      fil = trim(datafile)//'cross_sections/noefdis.txt'
+      !fil = trim(datafile)//'cross_sections/noefdis.txt'
+      fil = trim(datapath)//'CrossSections/NO/noefdis.txt'
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
       n = 33
@@ -2478,7 +2480,8 @@ end subroutine init_photolysis
 
 !     n2 cross sections
 
-      fil = trim(datafile)//'cross_sections/n2secef_01nm.txt'
+      !fil = trim(datafile)//'cross_sections/n2secef_01nm.txt'
+      fil = trim(datapath)//'CrossSections/N2/n2secef_01nm.txt'
       !print*, 'section efficace N2: ', fil
       OPEN(kin,FILE=fil,STATUS='OLD')
 
@@ -2502,7 +2505,8 @@ end subroutine init_photolysis
 
 !     photodissociation yield
 
-      fil = trim(datafile)//'cross_sections/n2_ionef_schunknagy2000.txt'
+      !fil = trim(datafile)//'cross_sections/n2_ionef_schunknagy2000.txt'
+      fil = trim(datapath)//'CrossSections/N2/n2_ionef_schunknagy2000.txt'
       OPEN(UNIT=kin,FILE=fil,STATUS='old')
 
       n = 19
