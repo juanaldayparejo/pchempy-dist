@@ -19,7 +19,6 @@ f.write(def2str+'"'+defpath[iin:2*iin]+'"\n')
 f.write(def3str+'"'+defpath[2*iin:len(defpath)]+'"\n')
 f.write(defstr)
 f.close()
-sys.exit()
 
 #Compiling fortran code
 ext1 = Extension(name='pchempy.pchemf',

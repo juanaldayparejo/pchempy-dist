@@ -5,13 +5,17 @@ MODULE photolysis
     !##################################################################################
 
     !Defining the gases whose photolysis can be determined in the current setup
-    integer, save :: n_gas_phot_inc = 12
+    integer, save :: n_gas_phot_inc = 19
 
-    integer, parameter, dimension(12) :: gasID_phot_inc = (/&
-    7, 2, 3, 1, 25, 44, 39, 8, 10, 22, 2, 2/)  !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2,(13C)O2,(18O)(12C)(16O)
+    integer, parameter, dimension(19) :: gasID_phot_inc = (/&
+    7, 2, 3, 1, 25, 44, 39, 8, 10, 22, & !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2
+    2, &                                 !13C - CO2
+    7, 2, 3, 1, 25, 44, 8, 10/)          !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
 
-    integer, parameter, dimension(12) :: isoID_phot_inc = (/&
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3/)  !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2,(13C)O2,(18O)(12C)(16O)
+    integer, parameter, dimension(19) :: isoID_phot_inc = (/&
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &  !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2
+    2, &                             !13C - CO2
+    2, 3, 2, 2, 2, 2, 3, 3/)         !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
 
     !Number of reactions associated with each photolysis
     !integer, parameter, dimension(11) :: n_phot_inc = (/&
@@ -48,12 +52,16 @@ MODULE photolysis
         integer :: ID_pos(ngas_phot)
         integer :: i,igas,igasx,n_phot1,i0,ilay,iw
         integer :: j_o2_o, j_o2_o1d
+        integer :: j_18o2_o, j_18o2_o1d_1, j_18o2_o1d_2
         integer :: j_co2_o, j_co2_o1d
         integer :: j_13co2_o, j_13co2_o1d
         integer :: j_18co2_o_1, j_18co2_o_2, j_18co2_o1d_1, j_18co2_o1d_2
         integer :: j_o3_o, j_o3_o1d
+        integer :: j_18o3_o_1, j_18o3_o_2, j_18o3_o1d_1, j_18o3_o1d_2
         integer :: j_h2o,j_h2o2,j_ho2,j_h2
+        integer :: j_18h2o,j_18h2o2,j_18ho2_1,j_18ho2_2
         integer :: j_no,j_no2,j_n2
+        integer :: j_18no,j_18no2_1,j_18no2_2
         double precision :: colincg(nlay,ngas),vmr(nlay,ngas),colinc(nlay)
         real, dimension(nlay,nw,ngas_phot) :: dtgas
         real, dimension(nlay,nw,n_phot) :: sj
@@ -88,7 +96,7 @@ MODULE photolysis
         !reading all the cross sections for the different species
         !####################################################################
 
-        call init_photolysis
+        call init_photolysis(ngas_phot,gasID_phot,isoID_phot)
 
         !Converting the column densities to cm-2 and calculating the mixing ratios
         !####################################################################
@@ -187,6 +195,28 @@ MODULE photolysis
                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
+            !(18O)(16O) PHOTOLYSIS
+            elseif( (gasID_phot(i).eq.7).and.(isoID_phot(i).eq.2) )then     !(18O)(16O)  
+
+                n_phot1 = n_phot1 + 3
+
+                !(18O)(16O) + hv --> (18O) + O
+                i0 = i0 + 1
+                j_18o2_o = i0
+
+                !(18O)(16O) + hv --> (18O) + O(1D)
+                i0 = i0 + 1
+                j_18o2_o1d_1 = i0
+
+                !(18O)(16O) + hv --> O + 18O(1D)
+                i0 = i0 + 1
+                j_18o2_o1d_2 = i0
+
+                call set18o2(n_phot, nlay, nw, wc, mopt, T, &
+                           xs18o2_150, xs18o2_200, xs18o2_250, xs18o2_300, yieldo2, &
+                           j_18o2_o, j_18o2_o1d_1, j_18o2_o1d_2, &
+                           colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
+                           rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
             !CO2 PHOTOLYSIS
             elseif ( (gasID_phot(i).eq.2).and.(isoID_phot(i).eq.0) )then  !CO2
@@ -233,7 +263,7 @@ MODULE photolysis
                 i0 = i0 + 1
                 j_18co2_o_1 = i0
 
-                !(12C)(16O)2 + hv --> (12C)(16O) + O    ----> For now we do not create 18O in other species than CO
+                !(12C)(16O)2 + hv --> (12C)(16O) + 18O
                 i0 = i0 + 1
                 j_18co2_o_2 = i0
 
@@ -241,7 +271,7 @@ MODULE photolysis
                 i0 = i0 + 1
                 j_18co2_o1d_1 = i0
 
-                !(18O)(12C)(16O) + hv --> (12C)(16O) + O(1D)   ----> For now we do not create 18O in other species than CO
+                !(18O)(12C)(16O) + hv --> (12C)(16O) + 18O(1D)
                 i0 = i0 + 1
                 j_18co2_o1d_2 = i0
 
@@ -269,6 +299,33 @@ MODULE photolysis
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
 
+            !(18O)O2 PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.3).and.(isoID_phot(i).eq.2) )then  !(18O)O2
+
+                n_phot1 = n_phot1 + 4
+
+                !(18O)O2 + hv --> (18O)O + O
+                i0 = i0 + 1
+                j_18o3_o_1 = i0
+
+                !(18O)O2 + hv --> O2 + (18O)
+                i0 = i0 + 1
+                j_18o3_o_2 = i0
+
+                !(18O)O2 + hv --> (18O)O + O(1D)
+                i0 = i0 + 1
+                j_18o3_o1d_1 = i0
+
+                !(18O)O2 + hv --> O2 + 18O(1D)
+                i0 = i0 + 1
+                j_18o3_o1d_2 = i0
+
+                call set18o3(n_phot, nlay, nw, wc, T, xso3_218, xso3_298, &
+                            j_18o3_o_1, j_18o3_o_2, j_18o3_o1d_1, j_18o3_o1d_2, &
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj,&
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+
             !H2O PHOTOLYSIS
             elseif ( (gasID_phot(i).eq.1).and.(isoID_phot(i).eq.0) )then  !H2O
 
@@ -279,6 +336,20 @@ MODULE photolysis
                 j_h2o = i0
 
                 call seth2o(n_phot, nlay, nw, wc, T, xsh2o, j_h2o, &
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+
+            !H2(18O) PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.1).and.(isoID_phot(i).eq.2) )then  !H2(18O)
+
+                n_phot1 = n_phot1 + 1
+
+                !H2(18O) + hv --> (18O)H + H
+                i0 = i0 + 1
+                j_18h2o = i0
+
+                call set18h2o(n_phot, nlay, nw, wc, T, xs18h2o, j_18h2o, &
                             colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
@@ -296,6 +367,19 @@ MODULE photolysis
                             colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
+            !H2(18O)O PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.25).and.(isoID_phot(i).eq.2) )then  !H2(18O)O
+
+                n_phot1 = n_phot1 + 1
+
+                !H2(18O)O + hv --> (18O)H + OH
+                i0 = i0 + 1
+                j_18h2o2 = i0
+
+                call set18h2o2(n_phot, nlay, nw, wc, T, xs18h2o2, j_18h2o2,&
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
 
             !HO2 PHOTOLYSIS
             elseif ( (gasID_phot(i).eq.44).and.(isoID_phot(i).eq.0) )then  !HO2
@@ -307,6 +391,24 @@ MODULE photolysis
                 j_ho2 = i0
 
                 call setho2(n_phot, nlay, nw, wc, T, xsho2, j_ho2, &
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+
+            !H(18O)O PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.44).and.(isoID_phot(i).eq.2) )then  !H(18O)O
+
+                n_phot1 = n_phot1 + 2
+
+                !H(18O)O + hv --> (18O)H + O
+                i0 = i0 + 1
+                j_18ho2_1 = i0
+
+                !H(18O)O + hv --> OH + (18O)
+                i0 = i0 + 1
+                j_18ho2_2 = i0
+
+                call set18ho2(n_phot, nlay, nw, wc, T, xs18ho2, j_18ho2_1, j_18ho2_2, &
                             colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
@@ -337,6 +439,19 @@ MODULE photolysis
                             colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
+            !N(18O) PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.8).and.(isoID_phot(i).eq.3) )then  !N(18O)
+
+                n_phot1 = n_phot1 + 1
+
+                !N(18O) + hv --> N + (18O)
+                i0 = i0 + 1
+                j_18no = i0
+
+                call set18no(n_phot, nlay, nw, wc, T, xs18no, yieldno, j_18no, &
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj, &
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
             !NO2 PHOTOLYSIS
             elseif ( (gasID_phot(i).eq.10).and.(isoID_phot(i).eq.0) )then  !NO2
 
@@ -348,6 +463,25 @@ MODULE photolysis
 
                 call setno2(n_phot, nlay, nw, wc, T, xsno2, xsno2_220,&
                             xsno2_294, yldno2_248, yldno2_298, j_no2,&
+                            colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj,&
+                            rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+            !N(18O)(16O) PHOTOLYSIS
+            elseif ( (gasID_phot(i).eq.10).and.(isoID_phot(i).eq.3) )then  !NO(18O)
+
+                n_phot1 = n_phot1 + 2
+
+                !NO(18O) + hv --> N(18O) + O
+                i0 = i0 + 1
+                j_18no2_1 = i0
+
+                !NO(18O) + hv --> NO + (18O)
+                i0 = i0 + 1
+                j_18no2_2 = i0
+
+                call set18no2(n_phot, nlay, nw, wc, T, xs18no2, xs18no2_220,&
+                            xs18no2_294, yldno2_248, yldno2_298, &
+                            j_18no2_1, j_18no2_2,&
                             colinc, vmr(:,ID_pos(i)), dtgas(:,:,i), sj,&
                             rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
 
@@ -584,6 +718,154 @@ MODULE photolysis
 
 
     end subroutine seto2
+
+!==============================================================================================================================================
+
+    subroutine set18o2(n_phot, nlayer, nw, wc, mopt, tlay, xs18o2_150, &
+                      xs18o2_200, xs18o2_250, xs18o2_300, yieldo2, j_18o2_o, &
+                      j_18o2_o1d_1, j_18o2_o1d_2, colinc, rm, dt, sj, &
+                      rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the (18O)(16O) temperature-dependent cross-sections and tau       =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: mopt                                          
+        integer :: j_18o2_o, j_18o2_o1d_1, j_18o2_o1d_2                             
+        real, dimension(nw)     :: wc                            
+        real, dimension(nw)     :: xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300
+        real, dimension(nw)     :: yieldo2                       
+        real, dimension(nlayer) :: tlay             !temperature             
+        double precision, dimension(nlayer) :: rm               !mixing ratio of O2      
+        double precision, dimension(nlayer) :: colinc           !column density (cm-2)              
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt         !optical depth             
+        real, dimension(nlayer,nw,n_phot) :: sj     !cross sections * yield                
+
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+
+        !     local:
+
+        integer :: ilev, iw
+        real    :: temp
+        real    :: xs18o2, factor
+
+        !     correction by factor if low-resolution in schumann-runge bands
+
+        if (mopt == 1) then
+            factor = 1.
+        else if (mopt == 2) then
+            factor = 0.8
+        end if
+
+        !     calculate temperature dependance
+
+        do ilev = 1,nlayer
+            temp = max(tlay(ilev),150.)
+            temp = min(temp, 300.)
+
+            do iw = 1, nw-1
+            if (tlay(ilev) > 250.) then
+                xs18o2 = xs18o2_250(iw) + (xs18o2_300(iw) - xs18o2_250(iw)) &
+                                    /(300. - 250.)*(temp - 250.) 
+            else if (tlay(ilev) > 200.) then
+                xs18o2 = xs18o2_200(iw) + (xs18o2_250(iw) - xs18o2_200(iw)) & 
+                                    /(250. - 200.)*(temp - 200.) 
+            else
+                xs18o2 = xs18o2_150(iw) + (xs18o2_200(iw) - xs18o2_150(iw)) &
+                                    /(200. - 150.)*(temp - 150.) 
+            end if
+
+            if (wc(iw) > 180. .and. wc(iw) < 200.) then
+                xs18o2 = xs18o2*factor
+            end if
+
+        !     optical depth
+
+            dt(ilev,iw) = colinc(ilev)*rm(ilev)*xs18o2
+
+        !     production of o(1d) for wavelengths shorter than 175 nm
+
+            if (wc(iw) >= 175.) then
+                sj(ilev,iw,j_18o2_o)   = xs18o2*yieldo2(iw)
+                sj(ilev,iw,j_18o2_o1d_1) = 0.
+                sj(ilev,iw,j_18o2_o1d_2) = 0.
+            else
+                sj(ilev,iw,j_18o2_o)   = 0.
+                sj(ilev,iw,j_18o2_o1d_1) = xs18o2*yieldo2(iw)/2.0
+                sj(ilev,iw,j_18o2_o1d_2) = xs18o2*yieldo2(iw)/2.0
+            end if
+
+            end do
+
+        end do
+
+        !     defining the reaction types and molecules involved
+
+        rtype(j_18o2_o) = 1
+                
+        ns(j_18o2_o) = 1
+        sID(1,j_18o2_o) = 7
+        sISO(1,j_18o2_o) = 2
+        sf(1,j_18o2_o) = 1.0
+
+        npr(j_18o2_o) = 2
+        pID(1,j_18o2_o) = 45
+        pISO(1,j_18o2_o) = 0
+        pf(1,j_18o2_o) = 1.0
+        pID(2,j_18o2_o) = 45
+        pISO(2,j_18o2_o) = 2
+        pf(2,j_18o2_o) = 1.0
+
+
+        rtype(j_18o2_o1d_1) = 1
+                
+        ns(j_18o2_o1d_1) = 1
+        sID(1,j_18o2_o1d_1) = 7
+        sISO(1,j_18o2_o1d_1) = 2
+        sf(1,j_18o2_o1d_1) = 1.0
+
+        npr(j_18o2_o1d_1) = 2
+        pID(1,j_18o2_o1d_1) = 45
+        pISO(1,j_18o2_o1d_1) = 2
+        pf(1,j_18o2_o1d_1) = 1.0 
+        pID(2,j_18o2_o1d_1) = 133
+        pISO(2,j_18o2_o1d_1) = 0
+        pf(2,j_18o2_o1d_1) = 1.0
+
+
+        rtype(j_18o2_o1d_2) = 1
+                
+        ns(j_18o2_o1d_2) = 1
+        sID(1,j_18o2_o1d_2) = 7
+        sISO(1,j_18o2_o1d_2) = 2
+        sf(1,j_18o2_o1d_2) = 1.0
+
+        npr(j_18o2_o1d_2) = 2
+        pID(1,j_18o2_o1d_2) = 45
+        pISO(1,j_18o2_o1d_2) = 0
+        pf(1,j_18o2_o1d_2) = 1.0 
+        pID(2,j_18o2_o1d_2) = 133
+        pISO(2,j_18o2_o1d_2) = 2
+        pf(2,j_18o2_o1d_2) = 1.0
+
+
+    end subroutine set18o2
 
 !==============================================================================================================================================
 
@@ -837,6 +1119,164 @@ MODULE photolysis
 
 !==============================================================================================================================================
 
+    subroutine set18o3(n_phot, nlayer, nw, wc, tlay, xs18o3_218, xs18o3_298, &
+                    j_18o3_o_1, j_18o3_o_2, j_18o3_o1d_1, j_18o3_o1d_2, &
+                    colinc, rm, dt, sj,&
+                    rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+   
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the O3 temperature dependent cross-sections and optical depth     =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: j_18o3_o_1, j_18o3_o_2, j_18o3_o1d_1, j_18o3_o1d_2                             
+        real, dimension(nw)     :: wc                          
+        real, dimension(nw)     :: xs18o3_218, xs18o3_298            
+        real, dimension(nlayer) :: tlay                         
+        double precision, dimension(nlayer) :: rm                            
+        double precision, dimension(nlayer) :: colinc                       
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj                     
+
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+        !
+        integer :: ilev, iw
+        real :: temp
+        real, dimension(nw) :: xs18o3(nw)
+        real, dimension(nw) :: qy1d              
+        real :: q1, q2, a1, a2, a3
+
+        do ilev = 1, nlayer
+        temp = max(tlay(ilev), 218.)
+        temp = min(temp,298.)
+        do iw = 1, nw-1
+            xs18o3(iw) = xs18o3_218(iw) + (xs18o3_298(iw) - xs18o3_218(iw)) &
+                                    /(298. - 218.) *(temp - 218.) 
+
+        !     optical depth
+
+            dt(ilev,iw) = colinc(ilev)*rm(ilev)*xs18o3(iw)
+
+        end do
+
+        !     calculate quantum yield for o(1d) production (jpl 2006)
+
+        temp = max(tlay(ilev),200.)
+        temp = min(temp,320.)
+        do iw = 1, nw-1
+            if (wc(iw) <= 306.) then
+                qy1d(iw) = 0.90
+            else if (wc(iw) > 306. .and. wc(iw) < 328.) then
+                q1 = 1.
+                q2 = exp(-825.518/(0.695*temp))
+                a1 = (304.225 - wc(iw))/5.576
+                a2 = (314.957 - wc(iw))/6.601
+                a3 = (310.737 - wc(iw))/2.187
+                qy1d(iw) = (q1/(q1 + q2))*0.8036*exp(-(a1*a1*a1*a1)) &
+                        + (q2/(q1 + q2))*8.9061*(temp/300.)**2. &
+                        *exp(-(a2*a2)) &
+                        + 0.1192*(temp/300.)**1.5*exp(-(a3*a3)) &
+                        + 0.0765
+            else if (wc(iw) >= 328. .and. wc(iw) <= 340.) then
+                qy1d(iw) = 0.08
+            else
+                qy1d(iw) = 0.
+            endif
+        end do
+        do iw = 1, nw-1
+            sj(ilev,iw,j_18o3_o_1)   = xs18o3(iw)*(1. - qy1d(iw))/2.0 
+            sj(ilev,iw,j_18o3_o_2)   = xs18o3(iw)*(1. - qy1d(iw))/2.0 
+            sj(ilev,iw,j_18o3_o1d_1) = xs18o3(iw)*qy1d(iw)/2.0
+            sj(ilev,iw,j_18o3_o1d_2) = xs18o3(iw)*qy1d(iw)/2.0
+        end do
+        end do
+   
+        !defining the reaction types and molecules involved
+
+        rtype(j_18o3_o_1) = 1
+            
+        ns(j_18o3_o_1) = 1
+        sID(1,j_18o3_o_1) = 3
+        sISO(1,j_18o3_o_1) = 2
+        sf(1,j_18o3_o_1) = 1.0
+
+        npr(j_18o3_o_1) = 2
+        pID(1,j_18o3_o_1) = 7
+        pISO(1,j_18o3_o_1) = 2
+        pf(1,j_18o3_o_1) = 1.0
+        pID(2,j_18o3_o_1) = 45
+        pISO(2,j_18o3_o_1) = 0
+        pf(2,j_18o3_o_1) = 1.0
+
+
+        rtype(j_18o3_o_2) = 1
+            
+        ns(j_18o3_o_2) = 1
+        sID(1,j_18o3_o_2) = 3
+        sISO(1,j_18o3_o_2) = 2
+        sf(1,j_18o3_o_2) = 1.0
+
+        npr(j_18o3_o_2) = 2
+        pID(1,j_18o3_o_2) = 7
+        pISO(1,j_18o3_o_2) = 0
+        pf(1,j_18o3_o_2) = 1.0
+        pID(2,j_18o3_o_2) = 45
+        pISO(2,j_18o3_o_2) = 2
+        pf(2,j_18o3_o_2) = 1.0
+
+
+        rtype(j_18o3_o1d_1) = 1
+                
+        ns(j_18o3_o1d_1) = 1
+        sID(1,j_18o3_o1d_1) = 3
+        sISO(1,j_18o3_o1d_1) = 2
+        sf(1,j_18o3_o1d_1) = 1.0
+
+        npr(j_18o3_o1d_1) = 2
+        pID(1,j_18o3_o1d_1) = 7
+        pISO(1,j_18o3_o1d_1) = 2
+        pf(1,j_18o3_o1d_1) = 1.0 
+        pID(2,j_18o3_o1d_1) = 133
+        pISO(2,j_18o3_o1d_1) = 0
+        pf(2,j_18o3_o1d_1) = 1.0
+
+
+        rtype(j_18o3_o1d_2) = 1
+                
+        ns(j_18o3_o1d_2) = 1
+        sID(1,j_18o3_o1d_2) = 3
+        sISO(1,j_18o3_o1d_2) = 2
+        sf(1,j_18o3_o1d_2) = 1.0
+
+        npr(j_18o3_o1d_2) = 2
+        pID(1,j_18o3_o1d_2) = 7
+        pISO(1,j_18o3_o1d_2) = 0
+        pf(1,j_18o3_o1d_2) = 1.0 
+        pID(2,j_18o3_o1d_2) = 133
+        pISO(2,j_18o3_o1d_2) = 2
+        pf(2,j_18o3_o1d_2) = 1.0
+
+
+    end subroutine set18o3
+
+!==============================================================================================================================================
+
     subroutine seth2o(n_phot, nlayer, nw, wc, tlay, xsh2o, j_h2o, &
                     colinc, rm, dt, sj,&
                     rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
@@ -905,6 +1345,76 @@ MODULE photolysis
         pf(2,j_h2o) = 1.0
 
     end subroutine seth2o
+
+!==============================================================================================================================================
+
+    subroutine set18h2o(n_phot, nlayer, nw, wc, tlay, xs18h2o, j_18h2o, &
+                    colinc, rm, dt, sj,&
+                    rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+   
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the H2(18O) cross-sections and optical depth     =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: j_18h2o                              
+        real, dimension(nw)     :: wc                          
+        real, dimension(nw)     :: xs18h2o            
+        real, dimension(nlayer) :: tlay                         
+        double precision, dimension(nlayer) :: rm                            
+        double precision, dimension(nlayer) :: colinc                       
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj                     
+
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+        
+        integer :: ilev, iw            
+
+        do ilev = 1, nlayer
+
+            !calculate the cross sections and optical depth
+
+            do iw = 1, nw-1
+                sj(ilev,iw,j_18h2o)   = xs18h2o(iw) 
+
+                dt(ilev,iw) = colinc(ilev)*rm(ilev)*xs18h2o(iw)
+            end do
+        end do
+   
+        !defining the reaction types and molecules involved
+
+        rtype(j_18h2o) = 1
+            
+        ns(j_18h2o) = 1
+        sID(1,j_18h2o) = 1   !H2O
+        sISO(1,j_18h2o) = 2
+        sf(1,j_18h2o) = 1.0
+
+        npr(j_18h2o) = 2
+        pID(1,j_18h2o) = 13  !OH
+        pISO(1,j_18h2o) = 2
+        pf(1,j_18h2o) = 1.0
+        pID(2,j_18h2o) = 48  !H
+        pISO(2,j_18h2o) = 0
+        pf(2,j_18h2o) = 1.0
+
+    end subroutine set18h2o
 
 !==============================================================================================================================================
 
@@ -1007,6 +1517,108 @@ MODULE photolysis
 
 !==============================================================================================================================================
 
+    subroutine set18h2o2(n_phot, nlayer, nw, wc, tlay, xs18h2o2, j_18h2o2,&
+                        colinc, rm, dt, sj, &
+                        rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the h2o2 temperature dependent cross-sections and optical depth   =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                           
+        integer :: j_18h2o2                                        
+        real, dimension(nw)     :: wc                            
+        real, dimension(nw)     :: xs18h2o2                        
+        real, dimension(nlayer) :: tlay                          
+        double precision, dimension(nlayer) :: rm                           
+        double precision, dimension(nlayer) :: colinc                     
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj       
+        
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+
+        integer :: ilev, iw
+        real    :: a0, a1, a2, a3, a4, a5, a6, a7
+        real    :: b0, b1, b2, b3, b4
+        real    :: lambda, suma, sumb, chi, temp, xs
+
+        A0 = 6.4761E+04            
+        A1 = -9.2170972E+02        
+        A2 = 4.535649              
+        A3 = -4.4589016E-03        
+        A4 = -4.035101E-05         
+        A5 = 1.6878206E-07
+        A6 = -2.652014E-10
+        A7 = 1.5534675E-13
+
+        B0 = 6.8123E+03
+        B1 = -5.1351E+01
+        B2 = 1.1522E-01
+        B3 = -3.0493E-05
+        B4 = -1.0924E-07
+
+        !     temperature dependance: jpl 2006
+
+        do ilev = 1,nlayer
+            temp = min(max(tlay(ilev),200.),400.)            
+            chi = 1./(1. + exp(-1265./temp))
+            do iw = 1, nw-1
+                if ((wc(iw) >= 260.) .and. (wc(iw) < 350.)) then
+                lambda = wc(iw)
+                sumA = ((((((A7*lambda + A6)*lambda + A5)*lambda + &
+                              A4)*lambda +A3)*lambda + A2)*lambda + &
+                              A1)*lambda + A0
+                sumB = (((B4*lambda + B3)*lambda + B2)*lambda + &
+                           B1)*lambda + B0
+                xs = (chi*sumA + (1. - chi)*sumB)*1.e-21
+                sj(ilev,iw,j_18h2o2) = xs
+                else
+                sj(ilev,iw,j_18h2o2) = xs18h2o2(iw)
+                end if
+
+                !     optical depth
+
+                dt(ilev,iw) = colinc(ilev)*rm(ilev)*sj(ilev,iw,j_18h2o2)
+            end do
+        end do
+
+        !defining the reaction types and molecules involved
+
+        rtype(j_18h2o2) = 1
+            
+        ns(j_18h2o2) = 1
+        sID(1,j_18h2o2) = 25   !H2(18O)O
+        sISO(1,j_18h2o2) = 2
+        sf(1,j_18h2o2) = 1.0
+
+        npr(j_18h2o2) = 2
+        pID(1,j_18h2o2) = 13  !(18O)H
+        pISO(1,j_18h2o2) = 2
+        pf(1,j_18h2o2) = 1.0
+        pID(2,j_18h2o2) = 13  !OH
+        pISO(2,j_18h2o2) = 0
+        pf(2,j_18h2o2) = 1.0
+
+    end subroutine set18h2o2
+
+!==============================================================================================================================================
+
     subroutine setho2(n_phot, nlayer, nw, wc, tlay, xsho2,j_ho2, &
                     colinc, rm, dt, sj,&
                     rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
@@ -1075,6 +1687,93 @@ MODULE photolysis
         pf(2,j_ho2) = 1.0
 
     end subroutine setho2
+
+!==============================================================================================================================================
+
+    subroutine set18ho2(n_phot, nlayer, nw, wc, tlay, xs18ho2,j_18ho2_1, j_18ho2_2, &
+                    colinc, rm, dt, sj,&
+                    rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+   
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the H(18O)O cross-sections and optical depth     =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: j_18ho2_1, j_18ho2_2                              
+        real, dimension(nw)     :: wc                          
+        real, dimension(nw)     :: xs18ho2            
+        real, dimension(nlayer) :: tlay                         
+        double precision, dimension(nlayer) :: rm                            
+        double precision, dimension(nlayer) :: colinc                       
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj                     
+
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+        
+        integer :: ilev, iw            
+
+        do ilev = 1, nlayer
+
+            !calculate the cross sections and optical depth
+
+            do iw = 1, nw-1
+                sj(ilev,iw,j_18ho2_1) = xs18ho2(iw)/2.0 
+                sj(ilev,iw,j_18ho2_2) = xs18ho2(iw)/2.0
+
+                dt(ilev,iw) = colinc(ilev)*rm(ilev)*xs18ho2(iw)
+            end do
+        end do
+   
+        !defining the reaction types and molecules involved
+
+        rtype(j_18ho2_1) = 1
+            
+        ns(j_18ho2_1) = 1
+        sID(1,j_18ho2_1) = 44   !H(18O)O
+        sISO(1,j_18ho2_1) = 2
+        sf(1,j_18ho2_1) = 1.0
+
+        npr(j_18ho2_1) = 2
+        pID(1,j_18ho2_1) = 13  !(18O)H
+        pISO(1,j_18ho2_1) = 2
+        pf(1,j_18ho2_1) = 1.0
+        pID(2,j_18ho2_1) = 45  !O
+        pISO(2,j_18ho2_1) = 0
+        pf(2,j_18ho2_1) = 1.0
+
+
+        rtype(j_18ho2_2) = 1
+            
+        ns(j_18ho2_2) = 1
+        sID(1,j_18ho2_2) = 44   !H(18O)O
+        sISO(1,j_18ho2_2) = 2
+        sf(1,j_18ho2_2) = 1.0
+
+        npr(j_18ho2_2) = 2
+        pID(1,j_18ho2_2) = 13  !OH
+        pISO(1,j_18ho2_2) = 0
+        pf(1,j_18ho2_2) = 1.0
+        pID(2,j_18ho2_2) = 45  !18O
+        pISO(2,j_18ho2_2) = 2
+        pf(2,j_18ho2_2) = 1.0
+
+    end subroutine set18ho2
 
 !==============================================================================================================================================
 
@@ -1238,6 +1937,120 @@ MODULE photolysis
 
 !==============================================================================================================================================
 
+    subroutine set18no2(n_phot, nlayer, nw, wc, tlay, xs18no2, xs18no2_220,&
+                       xs18no2_294, yldno2_248, yldno2_298, j_18no2_1, j_18no2_2,&
+                       colinc, rm, dt, sj,&
+                       rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the NO(18O) temp-dependent cross-sections and optical depth       =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: j_18no2_1, j_18no2_2                                 
+        real, dimension(nw)     :: wc                            
+        real, dimension(nw) :: xs18no2, xs18no2_220, xs18no2_294       
+        real, dimension(nw) :: yldno2_248, yldno2_298            
+        real, dimension(nlayer) :: tlay                          
+        double precision, dimension(nlayer) :: rm                            
+        double precision, dimension(nlayer) :: colinc                    
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj       
+        
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+
+        integer :: ilev, iw
+        real    :: temp, qy
+
+        !     temperature dependance: jpl 2006
+
+        do ilev = 1,nlayer
+            temp = max(220.,min(tlay(ilev),294.))
+            do iw = 1, nw - 1
+                if (wc(iw) < 238.) then
+                 sj(ilev,iw,j_18no2_1) = xs18no2(iw)/2.0
+                 sj(ilev,iw,j_18no2_2) = xs18no2(iw)/2.0
+                else
+                 sj(ilev,iw,j_18no2_1) = (xs18no2_220(iw) &
+                                    + (xs18no2_294(iw) - xs18no2_220(iw)) &
+                                    /(294. - 220.)*(temp - 220.))/2.0
+                 sj(ilev,iw,j_18no2_2) = (xs18no2_220(iw) &
+                                    + (xs18no2_294(iw) - xs18no2_220(iw)) &
+                                    /(294. - 220.)*(temp - 220.))/2.0
+                end if
+
+        !     optical depth
+
+                dt(ilev,iw) = colinc(ilev)*rm(ilev)*(sj(ilev,iw,j_18no2_1)+sj(ilev,iw,j_18no2_2))
+            end do
+        end do
+
+        !     quantum yield: jpl 2006
+
+        do ilev = 1,nlayer
+            temp = max(248.,min(tlay(ilev),298.))
+            do iw = 1, nw - 1
+                qy = yldno2_248(iw) + (yldno2_298(iw) - yldno2_248(iw)) &
+                                    /(298. - 248.)*(temp - 248.)
+                sj(ilev,iw,j_18no2_1) = sj(ilev,iw,j_18no2_1)*qy 
+                sj(ilev,iw,j_18no2_2) = sj(ilev,iw,j_18no2_2)*qy
+            end do
+        end do
+
+        !defining the reaction types and molecules involved
+
+        rtype(j_18no2_1) = 1
+            
+        ns(j_18no2_1) = 1
+        sID(1,j_18no2_1) = 10   !NO(18O)
+        sISO(1,j_18no2_1) = 3
+        sf(1,j_18no2_1) = 1.0
+
+        npr(j_18no2_1) = 2
+        pID(1,j_18no2_1) = 8    !N(18O)
+        pISO(1,j_18no2_1) = 3
+        pf(1,j_18no2_1) = 1.0
+        pID(2,j_18no2_1) = 45   !O
+        pISO(2,j_18no2_1) = 0
+        pf(2,j_18no2_1) = 1.0
+
+
+        rtype(j_18no2_2) = 1
+            
+        ns(j_18no2_2) = 1
+        sID(1,j_18no2_2) = 10   !NO(18O)
+        sISO(1,j_18no2_2) = 3
+        sf(1,j_18no2_2) = 1.0
+
+        npr(j_18no2_2) = 2
+        pID(1,j_18no2_2) = 8    !NO
+        pISO(1,j_18no2_2) = 0
+        pf(1,j_18no2_2) = 1.0
+        pID(2,j_18no2_2) = 45   !(18O)
+        pISO(2,j_18no2_2) = 2
+        pf(2,j_18no2_2) = 1.0
+
+
+    end subroutine set18no2
+
+!==============================================================================================================================================
+
     subroutine setno(n_phot, nlayer, nw, wc, tlay, xsno, yieldno, j_no, &
                     colinc, rm, dt, sj,&
                     rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
@@ -1305,6 +2118,76 @@ MODULE photolysis
         pf(2,j_no) = 1.0
 
     end subroutine setno
+
+!==============================================================================================================================================
+
+    subroutine set18no(n_phot, nlayer, nw, wc, tlay, xs18no, yieldno, j_18no, &
+                    colinc, rm, dt, sj,&
+                    rtype, ns, sID, sISO, sf, npr, pID, pISO, pf)
+   
+        !-----------------------------------------------------------------------------*
+        !=  PURPOSE:                                                                 =*
+        !=  Set up the N(18O) cross-sections and optical depth     =*
+        !-----------------------------------------------------------------------------*
+
+        implicit none
+
+        !     input:
+
+        integer :: n_phot                                            
+        integer :: nlayer                                        
+        integer :: nw                                            
+        integer :: j_18no                              
+        real, dimension(nw)     :: wc                          
+        real, dimension(nw)     :: xs18no,yieldno            
+        real, dimension(nlayer) :: tlay                         
+        double precision, dimension(nlayer) :: rm                            
+        double precision, dimension(nlayer) :: colinc                       
+
+        !     output:
+
+        real, dimension(nlayer,nw)    :: dt                      
+        real, dimension(nlayer,nw,n_phot) :: sj                     
+
+        integer :: rtype(n_phot)                    ! reaction type - always 1 for photolysis
+        integer :: ns(n_phot),npr(n_phot)           ! number of source and products
+        integer :: sID(2,n_phot),sISO(2,n_phot)     ! ID of the source molecules
+        integer :: pID(2,n_phot),pISO(2,n_phot)     ! ID of the product molecules
+        real :: sf(2,n_phot),pf(2,n_phot)           ! number of molecules per source/product
+
+        !     local:
+        
+        integer :: ilev, iw            
+
+        do ilev = 1, nlayer
+
+            !calculate the cross sections and optical depth
+
+            do iw = 1, nw-1
+                sj(ilev,iw,j_18no)   = xs18no(iw) * yieldno(iw) 
+
+                dt(ilev,iw) = colinc(ilev)*rm(ilev)*xs18no(iw)
+            end do
+        end do
+   
+        !defining the reaction types and molecules involved
+
+        rtype(j_18no) = 1
+            
+        ns(j_18no) = 1
+        sID(1,j_18no) = 8   !NO
+        sISO(1,j_18no) = 3
+        sf(1,j_18no) = 1.0
+
+        npr(j_18no) = 2
+        pID(1,j_18no) = 134  !N
+        pISO(1,j_18no) = 0
+        pf(1,j_18no) = 1.0
+        pID(2,j_18no) = 45   !O
+        pISO(2,j_18no) = 2
+        pf(2,j_18no) = 1.0
+
+    end subroutine set18no
 
 !==============================================================================================================================================
 
@@ -1592,8 +2475,8 @@ MODULE photolysis
                     sj(i,l,j_18co2_o1d_2) = 0.
                 else
                     sj(i,l,j_18co2_o_1) = 0.
-                    sj(i,l,j_18co2_o1d_1) = sco2*yieldco2(l)/2.
                     sj(i,l,j_18co2_o_2) = 0.
+                    sj(i,l,j_18co2_o1d_1) = sco2*yieldco2(l)/2.
                     sj(i,l,j_18co2_o1d_2) = sco2*yieldco2(l)/2.
                 end if
             end do
@@ -1601,7 +2484,7 @@ MODULE photolysis
    
         !defining the reaction types and molecules involved
 
-        !(18O)(12C)(16O) + hv   ---->    (12C)(18O) + (16O)   
+        !(18O)(12C)(16O) + hv  ---->  (12C)(18O) + (16O)   
         rtype(j_18co2_o_1) = 1
             
         ns(j_18co2_o_1) = 1
@@ -1618,7 +2501,7 @@ MODULE photolysis
         pf(2,j_18co2_o_1) = 1.0
 
 
-        !(18O)(12C)(16O) + hv   ---->    (12C)(16O) + O   !For now we do not create other 18O species  
+        !(18O)(12C)(16O) + hv   ---->    (12C)(16O) + 18O  !For now we do not produce 18O
         rtype(j_18co2_o_2) = 1
             
         ns(j_18co2_o_2) = 1
@@ -1652,7 +2535,7 @@ MODULE photolysis
         pf(2,j_18co2_o1d_1) = 1.0
 
 
-        !(18O)(12C)(16O) + hv   ---->    (12C)(16O) + O(1D) !For now we do not create other 18O species  
+        !(18O)(12C)(16O) + hv   ---->    (12C)(16O) + 18O(1D)  
         rtype(j_18co2_o1d_2) = 1
                 
         ns(j_18co2_o1d_2) = 1

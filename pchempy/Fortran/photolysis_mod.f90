@@ -1,137 +1,201 @@
 module photolysis_mod
 
-  implicit none
+      implicit none
 
-  include 'datapath.h'
+      include 'datapath.h'
 
-! photolysis
+      ! photolysis
 
-  integer, save :: nphot = 15             ! number of photolysis
-                                          ! is incremented by +2 in calchim if deuterium chemisty)
-  integer, parameter :: nabs  = 14        ! number of absorbing gases
+      integer, save :: nphot = 15             ! number of photolysis
+                                                ! is incremented by +2 in calchim if deuterium chemisty)
+      integer, parameter :: nabs  = 14        ! number of absorbing gases
 
-! spectral grid
+      ! spectral grid
 
-!  integer, parameter :: nw = 162          ! number of spectral intervals (low-res)
-  integer, parameter :: nw = 3789
-  integer, save :: mopt                   ! high-res/low-res switch
+      !  integer, parameter :: nw = 162          ! number of spectral intervals (low-res)
+      integer, parameter :: nw = 3789
+      integer, save :: mopt                   ! high-res/low-res switch
 
-  real, dimension(nw), save :: wl, wc, wu ! lower, center, upper wavelength for each interval
+      real, dimension(nw), save :: wl, wc, wu ! lower, center, upper wavelength for each interval
 
-! solar flux
+      ! solar flux
 
-  real, dimension(nw), save :: f          !  solar flux (w.m-2.nm-1) at 1 au
+      real, dimension(nw), save :: f          !  solar flux (w.m-2.nm-1) at 1 au
 
-! datafile
-  character(len=300),save :: datafile
-  character(len=300),save :: datafile1,datafile2
+      ! datafile
+      character(len=300),save :: datafile
+      character(len=300),save :: datafile1,datafile2
 
-! cross-sections and quantum yields
+      ! cross-sections and quantum yields
 
-  real, dimension(nw), save :: xsco2_195, xsco2_295, xsco2_370        ! co2 absorption cross-section at 195-295-370 k (cm2)
-  real, dimension(nw), save :: yieldco2                               ! co2 photodissociation yield
-  real, dimension(nw), save :: xs13co2_195, xs13co2_295, xs13co2_370  ! (13c)(16o)2 absorption cross-section at 195-295-370 k (cm2)
-  real, dimension(nw), save :: xs18co2_195, xs18co2_295, xs18co2_370  ! (18o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
-  real, dimension(nw), save :: xs17co2_195, xs17co2_295, xs17co2_370  ! (17o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
-  real, dimension(nw), save :: xso2_150, xso2_200, xso2_250, xso2_300 ! o2 absorption cross-section at 150-200-250-300 k (cm2)
-  real, dimension(nw), save :: yieldo2                                ! o2 photodissociation yield
-  real, dimension(nw), save :: xso3_218, xso3_298                     ! o3 absorption cross-section at 218-298 k (cm2)
-  real, dimension(nw), save :: xsh2o                                  ! h2o absorption cross-section (cm2)
-  real, dimension(nw), save :: xsh2o2                                 ! h2o2 absorption cross-section (cm2)
-  real, dimension(nw), save :: xsho2                                  ! ho2 absorption cross-section (cm2)
-  real, dimension(nw), save :: xsh2                                   ! h2 absorption cross-section (cm2)
-  real, dimension(nw), save :: yieldh2                                ! h2 photodissociation yield
-  real, dimension(nw), save :: xsno2, xsno2_220, xsno2_294            ! no2 absorption cross-section at 220-294 k (cm2)
-  real, dimension(nw), save :: yldno2_248, yldno2_298                 ! no2 quantum yield at 248-298 k
-  real, dimension(nw), save :: xsno                                   ! no absorption cross-section (cm2)
-  real, dimension(nw), save :: yieldno                                ! no photodissociation yield
-  real, dimension(nw), save :: xsn2                                   ! n2 absorption cross-section (cm2)
-  real, dimension(nw), save :: yieldn2                                ! n2 photodissociation yield
-  real, dimension(nw), save :: xshdo                                  ! hdo absorption cross-section (cm2)
-  real, dimension(nw), save :: albedo                                 ! surface albedo
+      real, dimension(nw), save :: xsco2_195, xsco2_295, xsco2_370                ! co2 absorption cross-section at 195-295-370 k (cm2)
+      real, dimension(nw), save :: yieldco2                                       ! co2 photodissociation yield
+      real, dimension(nw), save :: xs13co2_195, xs13co2_295, xs13co2_370          ! (13c)(16o)2 absorption cross-section at 195-295-370 k (cm2)
+      real, dimension(nw), save :: xs18co2_195, xs18co2_295, xs18co2_370          ! (18o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
+      real, dimension(nw), save :: xs17co2_195, xs17co2_295, xs17co2_370          ! (17o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
+      real, dimension(nw), save :: xso2_150, xso2_200, xso2_250, xso2_300         ! o2 absorption cross-section at 150-200-250-300 k (cm2)
+      real, dimension(nw), save :: xs18o2_150, xs18o2_200, xs18o2_250, xs18o2_300 ! (18o)(16o) absorption cross-section at 150-200-250-300 k (cm2)
+      real, dimension(nw), save :: yieldo2                                        ! o2 photodissociation yield
+      real, dimension(nw), save :: xso3_218, xso3_298                             ! o3 absorption cross-section at 218-298 k (cm2)
+      real, dimension(nw), save :: xs18o3_218, xs18o3_298                         ! (18o)(16o)2 absorption cross-section at 218-298 k (cm2)
+      real, dimension(nw), save :: xsh2o                                          ! h2o absorption cross-section (cm2)
+      real, dimension(nw), save :: xs18h2o                                        ! h2(18o) absorption cross-section (cm2)
+      real, dimension(nw), save :: xsh2o2                                         ! h2o2 absorption cross-section (cm2)
+      real, dimension(nw), save :: xs18h2o2                                       ! h2(18o)(16o) absorption cross-section (cm2)
+      real, dimension(nw), save :: xsho2                                          ! ho2 absorption cross-section (cm2)
+      real, dimension(nw), save :: xs18ho2                                        ! h(18o)(16o) absorption cross-section (cm2)
+      real, dimension(nw), save :: xsh2                                           ! h2 absorption cross-section (cm2)
+      real, dimension(nw), save :: yieldh2                                        ! h2 photodissociation yield
+      real, dimension(nw), save :: xsno2, xsno2_220, xsno2_294                    ! no2 absorption cross-section at 220-294 k (cm2)
+      real, dimension(nw), save :: xs18no2, xs18no2_220, xs18no2_294              ! n(18o)(16o) absorption cross-section at 220-294 k (cm2)
+      real, dimension(nw), save :: yldno2_248, yldno2_298                         ! no2 quantum yield at 248-298 k
+      real, dimension(nw), save :: xsno                                           ! no absorption cross-section (cm2)
+      real, dimension(nw), save :: xs18no                                           ! n(18o) absorption cross-section (cm2)
+      real, dimension(nw), save :: yieldno                                        ! no photodissociation yield
+      real, dimension(nw), save :: xsn2                                           ! n2 absorption cross-section (cm2)
+      real, dimension(nw), save :: yieldn2                                        ! n2 photodissociation yield
+      real, dimension(nw), save :: xshdo                                          ! hdo absorption cross-section (cm2)
+      real, dimension(nw), save :: albedo                                         ! surface albedo
 
 contains
 
-subroutine init_photolysis
- 
-! define where the files are stored
-  !datafile1='/home/stem/ja22256/Documents/Projects/PlanetaryScience/'
-  !datafile2='ModChem/c13_mcd_ronsebrock/photolysis_fortran/datafile/'
-  !datafile=trim(datafile1)//trim(datafile2)
+      subroutine init_photolysis(ngas_phot,gasID_phot,isoID_phot)
+      
+            !Routine to read the photolysis cross sections of all species
 
-! initialise on-line photolysis
+            !Inputs
+            !-------
 
-! mopt = 1 high-resolution
-! mopt = 2 low-resolution (recommended for gcm use)
+            !ngas_phot :: Number of active gases
+            !gasID_phot(ngas_phot) :: ID of the active gases
+            !isoID_phot(ngas_phot) :: Isotope ID of the gases
 
-  mopt = 1
+            ! initialise on-line photolysis
 
-! set wavelength grid
+            ! mopt = 1 high-resolution
+            ! mopt = 2 low-resolution (recommended for gcm use)
+            
+            mopt = 1
 
-  call gridw(nw,wl,wc,wu,mopt)
+            integer, intent(in) :: ngas_phot,gasID_phot(ngas_phot),isoID_phot(ngas_phot)
+            integer :: igas
 
-! read and grid solar flux data
+            ! set wavelength grid
+            call gridw(nw,wl,wc,wu,mopt)
+            
+            ! read and grid solar flux data
+            call rdsolarflux(nw,wl,wc,f)
+            
+            ! set surface albedo
+            call setalb(nw,wl,albedo)
+            
+            do igas=1,ngas_phot
 
-  call rdsolarflux(nw,wl,wc,f)
+                  if((gasID_phot(igas).eq.7).and.(gasID_phot(igas).eq.0))then
 
-! read and grid o2 cross-sections
+                        ! read and grid o2 cross-sections
+                        call rdxso2(nw,wl,xso2_150,xso2_200,xso2_250,xso2_300,yieldo2)
+             
+                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.0))then
+                        
+                        ! read and grid co2 cross-sections
+                        call rdxsco2(nw,wl,xsco2_195,xsco2_295,xsco2_370,yieldco2)
+            
+                  elseif((gasID_phot(igas).eq.3).and.(gasID_phot(igas).eq.0))then
 
-  call rdxso2(nw,wl,xso2_150,xso2_200,xso2_250,xso2_300,yieldo2)
+                        ! read and grid o3 cross-sections
+                        call rdxso3(nw,wl,xso3_218,xso3_298)
+             
+                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.0))then
 
-! read and grid co2 cross-sections
+                        ! read and grid h2o cross-sections
+                        call rdxsh2o(nw,wl,xsh2o)
+            
+                  elseif((gasID_phot(igas).eq.25).and.(gasID_phot(igas).eq.0))then
 
-  call rdxsco2(nw,wl,xsco2_195,xsco2_295,xsco2_370,yieldco2)
+                        ! read and grid h2o2 cross-sections
+                        call rdxsh2o2(nw,wl,xsh2o2)
+            
+                  elseif((gasID_phot(igas).eq.44).and.(gasID_phot(igas).eq.0))then
 
-! read and grid (13c)(16o)2 cross-sections
+                        ! read and grid ho2 cross-sections
+                        call rdxsho2(nw,wl,xsho2)
+            
+                  elseif((gasID_phot(igas).eq.39).and.(gasID_phot(igas).eq.0))then
 
-  call rdxs13co2(nw,wl,xs13co2_195,xs13co2_295,xs13co2_370,yieldco2)
+                        ! read and grid h2 cross-sections
+                        call rdxsh2(nw,wl,wc,xsh2,yieldh2)
+            
+                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.4))then
 
-! read and grid (18O(12C)(16O) cross-sections
+                        ! read and grid hdo cross-sections
+                        call rdxshdo(nw,wl,xshdo)
 
-  call rdxs18co2(nw,wl,xs18co2_195,xs18co2_295,xs18co2_370,yieldco2)
+                  elseif((gasID_phot(igas).eq.8).and.(gasID_phot(igas).eq.0))then
 
-! read and grid o3 cross-sections
+                        ! read and grid no cross-sections
+                        call rdxsno(nw,wl,xsno,yieldno)
+            
+                  elseif((gasID_phot(igas).eq.10).and.(gasID_phot(igas).eq.0))then
 
-  call rdxso3(nw,wl,xso3_218,xso3_298)
+                        ! read and grid no2 cross-sections
+                        call rdxsno2(nw,wl,xsno2,xsno2_220,xsno2_294,yldno2_248,yldno2_298)
+            
+                  elseif((gasID_phot(igas).eq.22).and.(gasID_phot(igas).eq.0))then
 
-! read and grid h2o cross-sections
+                        ! read and grid n2 cross-sections
+                        call rdxsn2(nw,wl,xsn2,yieldn2)
 
-  call rdxsh2o(nw,wl,xsh2o)
+                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.2))then
 
-! read and grid h2o2 cross-sections
+                        ! read and grid (13C)(16O)2 cross-sections
+                        call rdxs13co2(nw,wl,xs13co2_195,xs13co2_295,xs13co2_370,yieldco2)
 
-  call rdxsh2o2(nw,wl,xsh2o2)
+                  elseif((gasID_phot(igas).eq.7).and.(gasID_phot(igas).eq.2))then
 
-! read and grid ho2 cross-sections
+                        ! read and grid (18o)(16o) cross-sections
+                        call rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yield18o2)
+            
+                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.3))then
 
-  call rdxsho2(nw,wl,xsho2)
+                        ! read and grid (18O)(12C)(16O) cross-sections
+                        call rdxs18co2(nw,wl,xs18co2_195,xs18co2_295,xs18co2_370,yieldco2)
+            
+                  elseif((gasID_phot(igas).eq.3).and.(gasID_phot(igas).eq.2))then
 
-! read and grid h2 cross-sections
+                        ! read and grid (18O)(16O)2 cross-sections
+                        call rdxs18o3(nw,wl,xs18o3_218,xs18o3_298)
+            
+                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.2))then
 
-  call rdxsh2(nw,wl,wc,xsh2,yieldh2)
+                        ! read and grid h2(18o) cross-sections
+                        call rdxs18h2o(nw,wl,xs18h2o)
 
-! read and grid no cross-sections
+                  elseif((gasID_phot(igas).eq.25).and.(gasID_phot(igas).eq.2))then
+            
+                        ! read and grid h2(18o)(16o) cross-sections
+                        call rdxs18h2o2(nw,wl,xs18h2o2)
+            
+                  elseif((gasID_phot(igas).eq.44).and.(gasID_phot(igas).eq.2))then
 
-  call rdxsno(nw,wl,xsno,yieldno)
+                        ! read and grid h(18o)(16o) cross-sections
+                        call rdxs18ho2(nw,wl,xs18ho2)
 
-! read and grid no2 cross-sections
+                  elseif((gasID_phot(igas).eq.8).and.(gasID_phot(igas).eq.3))then
 
-  call rdxsno2(nw,wl,xsno2,xsno2_220,xsno2_294,yldno2_248,yldno2_298)
+                        ! read and grid no cross-sections
+                        call rdxs18no(nw,wl,xs18no,yieldno)
+            
+                  elseif((gasID_phot(igas).eq.10).and.(gasID_phot(igas).eq.3))then
 
-! read and grid n2 cross-sections
+                        ! read and grid no2 cross-sections
+                        call rdxs18no2(nw,wl,xs18no2,xs18no2_220,xs18no2_294,yldno2_248,yldno2_298)
 
-  call rdxsn2(nw,wl,xsn2,yieldn2)
+                  endif
 
-! read and grid hdo cross-sections
+            enddo
 
-  call rdxshdo(nw,wl,xshdo)
-
-! set surface albedo
-
-  call setalb(nw,wl,albedo)
-  
-
-end subroutine init_photolysis
+      end subroutine init_photolysis
 
 !==============================================================================
 
@@ -1692,6 +1756,194 @@ end subroutine init_photolysis
 
 !==============================================================================
 
+      subroutine rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yieldo2)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read and grid O2 cross-sections and photodissociation yield              =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW      - INTEGER, number of specified intervals + 1 in working       (I)=*
+!=            wavelength grid                                                =*
+!=  WL      - REAL, vector of lower limits of wavelength intervals in     (I)=*
+!=            working wavelength grid                                        =*
+!=  XSO2    - REAL, molecular absorption cross section                       =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      implicit none
+
+!#include "datafile.h"
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower and central wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: xs18o2_150, xs18o2_200, xs18o2_250, xs18o2_300 ! (16o)(18o) cross-sections (cm2)
+      real, dimension(nw) :: yieldo2  ! o2 photodissociation yield
+
+!     local
+
+      integer, parameter :: kdata = 18000
+      real, parameter :: deltax = 1.e-4
+      real, dimension(kdata) :: x1, y1, x2, y2, x3, y3, x4, y4
+      real, dimension(kdata) :: xion, ion
+      real    :: factor, xl, xu, dummy
+      integer :: i, ierr, n, n1, n2, n3, n4, nhead
+      integer :: kin, kout ! input/output logical units
+      character*300 fil
+
+      kin  = 10
+      kout = 30
+
+!     read o2 cross section data
+
+      nhead = 22
+      n     = 17434
+
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_150K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_150K.txt'
+      
+      !print*, 'section efficace O2 150K: ', fil
+      open(kin, file=fil, status='old', iostat=ierr)
+
+      if (ierr /= 0) THEN
+         write(*,*)'cant find O2 cross-sections : ', fil
+         stop
+      end if
+
+      DO i = 1,nhead
+         read(kin,*)
+      END DO
+
+      n1 = n
+      DO i = 1, n1
+         READ(kin,*) x1(i), y1(i)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x1,y1,kdata,n1,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n1,               0.,0.)
+      CALL addpnt(x1,y1,kdata,n1,x1(n1)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n1,           1.e+38,0.)
+      CALL inter2(nw,wl,xs18o2_150,n1,x1,y1,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_200K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_200K.txt'
+      !print*, 'section efficace O2 200K: ', fil
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      DO i = 1,nhead
+         read(kin,*)
+      END DO
+
+      n2 = n
+      DO i = 1, n2
+         READ(kin,*) x2(i), y2(i)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x2,y2,kdata,n2,x2(1)*(1.-deltax),0.)
+      CALL addpnt(x2,y2,kdata,n2,               0.,0.)
+      CALL addpnt(x2,y2,kdata,n2,x2(n2)*(1.+deltax),0.)
+      CALL addpnt(x2,y2,kdata,n2,           1.e+38,0.)
+      CALL inter2(nw,wl,xs18o2_200,n2,x2,y2,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_250K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_250K.txt'
+      !print*, 'section efficace O2 250K: ', fil
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      DO i = 1,nhead
+         read(kin,*)
+      END DO
+
+      n3 = n
+      DO i = 1, n3
+         READ(kin,*) x3(i), y3(i)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x3,y3,kdata,n3,x3(1)*(1.-deltax),0.)
+      CALL addpnt(x3,y3,kdata,n3,               0.,0.)
+      CALL addpnt(x3,y3,kdata,n3,x3(n3)*(1.+deltax),0.)
+      CALL addpnt(x3,y3,kdata,n3,           1.e+38,0.)
+      CALL inter2(nw,wl,xs18o2_250,n3,x3,y3,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      !fil = trim(datafile)//'cross_sections/o2_composite_2018_300K.txt'
+      fil = trim(datapath)//'CrossSections/O2/o2_composite_2018_300K.txt'
+      !print*, 'section efficace O2 300K: ', fil
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      DO i = 1,nhead
+         read(kin,*)
+      END DO
+
+      n4 = n
+      DO i = 1, n4
+         READ(kin,*) x4(i), y4(i)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x4,y4,kdata,n4,x4(1)*(1.-deltax),0.)
+      CALL addpnt(x4,y4,kdata,n4,               0.,0.)
+      CALL addpnt(x4,y4,kdata,n4,x4(n4)*(1.+deltax),0.)
+      CALL addpnt(x4,y4,kdata,n4,           1.e+38,0.)
+      CALL inter2(nw,wl,xs18o2_300,n4,x4,y4,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+!     photodissociation yield
+
+      !fil = trim(datafile)//'cross_sections/efdis_co2-o2_schunkandnagy2000.txt'
+      fil = trim(datapath)//'CrossSections/O2/efdis_co2-o2_schunkandnagy2000.txt'
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      do i = 1,11
+         read(kin,*)
+      end do
+
+      n = 9
+      DO i = 1, n
+         READ(kin,*) xl, xu, dummy, ion(i)
+         xion(i) = (xl + xu)/2.
+         ion(i) = max(ion(i), 0.)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(xion,ion,kdata,n,xion(1)*(1.-deltax),0.)
+      CALL addpnt(xion,ion,kdata,n,          0.,0.)
+      CALL addpnt(xion,ion,kdata,n,xion(n)*(1.+deltax),1.)
+      CALL addpnt(xion,ion,kdata,n,      1.e+38,1.)
+      CALL inter2(nw,wl,yieldo2,n,xion,ion,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      end subroutine rdxso2
+
+
+!==============================================================================
+
       subroutine rdxso3(nw,wl,xso3_218,xso3_298)
 
 !-----------------------------------------------------------------------------*
@@ -1799,6 +2051,112 @@ end subroutine init_photolysis
 
       end subroutine rdxso3
 
+
+!==============================================================================
+
+      subroutine rdxs18o3(nw,wl,xs18o3_218,xs18o3_298)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read ozone molecular absorption cross section.  Re-grid data to match    =*
+!=  specified wavelength working grid.                                       =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!=  WL     - REAL, vector of lower limits of wavelength intervals in      (I)=*
+!=           working wavelength grid                                         =*
+!=  XS18O3_218 REAL, molecular absoprtion cross section (cm^2) of O3 at     (O)=*
+!=           each specified wavelength (JPL 2006)  218 K                     =*
+!=  XS18O3_298 REAL, molecular absoprtion cross section (cm^2) of O3 at     (O)=*
+!=           each specified wavelength (JPL 2006)  298 K                     =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      implicit none
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower and central wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: xs18o3_218, xs18o3_298 ! o3 cross-sections (cm2)
+
+!     local
+
+      integer, parameter :: kdata = 200
+      real, parameter :: deltax = 1.e-4
+      real, dimension(kdata) :: x1, x2, y1, y2
+      real, dimension(nw) :: yg
+      real :: a1, a2
+
+      integer :: i, ierr, iw, n, n1, n2
+      integer :: kin, kout ! input/output logical units
+
+      character*300 fil
+
+      kin  = 10
+
+!     JPL 2006 218 K
+
+      fil = trim(datapath)//'CrossSections/O3/o3_cross-sections_jpl_2006_218K.txt'
+      !print*, 'section efficace O3 218K: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+      n1 = 167
+      DO i = 1, n1
+         READ(kin,*) a1, a2, y1(i)
+         x1(i) = (a1+a2)/2.
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x1,y1,kdata,n1,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n1,          0.,0.)
+      CALL addpnt(x1,y1,kdata,n1,x1(n1)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n1,      1.e+38,0.)
+      CALL inter2(nw,wl,yg,n1,x1,y1,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      DO iw = 1, nw-1
+         xs18o3_218(iw) = yg(iw)
+      END DO
+
+!     JPL 2006 298 K
+
+      !fil = trim(datafile)//'cross_sections/o3_cross-sections_jpl_2006_298K.txt'
+      fil = trim(datapath)//'CrossSections/O3/o3_cross-sections_jpl_2006_298K.txt'
+      !print*, 'section efficace O3 298K: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+      n2 = 167
+      DO i = 1, n2
+         READ(kin,*) a1, a2, y2(i)
+         x2(i) = (a1+a2)/2.
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x2,y2,kdata,n2,x2(1)*(1.-deltax),0.)
+      CALL addpnt(x2,y2,kdata,n2,          0.,0.)
+      CALL addpnt(x2,y2,kdata,n2,x2(n2)*(1.+deltax),0.)
+      CALL addpnt(x2,y2,kdata,n2,      1.e+38,0.)
+      CALL inter2(nw,wl,yg,n2,x2,y2,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      DO iw = 1, nw-1
+         xs18o3_298(iw) = yg(iw)
+      END DO
+
+      end subroutine rdxs18o3
+
 !==============================================================================
 
       subroutine rdxsh2o(nw, wl, yg)
@@ -1871,6 +2229,79 @@ end subroutine init_photolysis
       ENDIF
 
       end subroutine rdxsh2o
+
+!==============================================================================
+
+      subroutine rdxs18h2o(nw, wl, yg)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read H2(18O) molecular absorption cross section.  Re-grid data to match      =*
+!=  specified wavelength working grid.                                       =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!=  WL     - REAL, vector of lower limits of wavelength intervals in      (I)=*
+!=           working wavelength grid                                         =*
+!=  YG     - REAL, molecular absoprtion cross section (cm^2) of H2O at    (O)=*
+!=           each specified wavelength                                       =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      IMPLICIT NONE
+
+!#include "datafile.h"
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower and central wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: yg   ! h2o cross-sections (cm2)
+
+!     local
+
+      integer, parameter :: kdata = 500
+      real, parameter :: deltax = 1.e-4
+      REAL x1(kdata)
+      REAL y1(kdata)
+      INTEGER ierr
+      INTEGER i, n
+      CHARACTER*300 fil
+      integer :: kin, kout ! input/output logical units
+
+      kin = 10
+
+      fil = trim(datapath)//'CrossSections/H2O/h2o_composite_250K.txt'
+      !print*, 'section efficace H2O: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      DO i = 1,26
+         read(kin,*)
+      END DO
+
+      n = 420
+      DO i = 1, n
+         READ(kin,*) x1(i), y1(i)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,          0.,0.)
+      CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,      1.e+38,0.)
+      CALL inter2(nw,wl,yg,n,x1,y1,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      end subroutine rdxs18h2o
 
 !==============================================================================
 
@@ -2025,6 +2456,83 @@ end subroutine init_photolysis
 
 !==============================================================================
 
+      subroutine rdxs18h2o2(nw, wl, xs18h2o2)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read and grid H2(18O)(16O) cross-sections
+!=         H2(18O)(16O) + hv -> (16O)H + (18O)H                                                 =*
+!=  Cross section:  Schuergers and Welge, Z. Naturforsch. 23a (1968) 1508    =*
+!=                  from 125 to 185 nm, then JPL97 from 190 to 350 nm.       =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!=  WL     - REAL, vector of lower limits of wavelength intervals in      (I)=*
+!=           working wavelength grid                                         =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      implicit none
+
+!#include "datafile.h"
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: xs18h2o2   ! h2o2 cross-sections (cm2)
+
+!     local
+
+      real, parameter :: deltax = 1.e-4
+      integer, parameter :: kdata = 100
+      real, dimension(kdata) :: x1, y1
+      real, dimension(nw)    :: yg
+      integer :: i, ierr, iw, n, idum
+      integer :: kin, kout ! input/output logical units
+      character*300 fil
+
+      kin = 10
+
+!     read cross-sections
+
+      !fil = trim(datafile)//'cross_sections/h2o2_composite.txt'
+      fil = trim(datapath)//'CrossSections/H2O2/h2o2_composite.txt'
+      !print*, 'section efficace H2O2: ', fil
+
+      OPEN(kin,FILE=fil,STATUS='OLD')
+      READ(kin,*) idum,n
+      DO i = 1, idum-2
+         READ(kin,*)
+      ENDDO
+      DO i = 1, n
+         READ(kin,*) x1(i), y1(i)
+      ENDDO
+      CLOSE (kin)
+
+      CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,               0.,0.)
+      CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,           1.e+38,0.)
+      CALL inter2(nw,wl,yg,n,x1,y1,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      DO iw = 1, nw - 1
+         xsh2o2(iw) = yg(iw)
+      END DO
+
+      end subroutine rdxs18h2o2
+
+!==============================================================================
+
       subroutine rdxsho2(nw, wl, yg)
 
 !-----------------------------------------------------------------------------*
@@ -2089,6 +2597,69 @@ end subroutine init_photolysis
       ENDIF
 
       end subroutine rdxsho2
+
+!==============================================================================
+
+      subroutine rdxs18ho2(nw, wl, yg)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read h(18o)(16o) cross-sections                                                  =*
+!=  JPL 2006 recommendation                                                  =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!-----------------------------------------------------------------------------*
+
+      IMPLICIT NONE
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: yg   ! h(18o)(16o) cross-sections (cm2)
+
+!     local
+
+      real, parameter :: deltax = 1.e-4
+      integer, parameter :: kdata = 100
+      real, dimension(kdata) :: x1, y1
+      integer :: i, n, ierr
+      character*300 fil
+      integer :: kin, kout ! input/output logical units
+
+      kin = 10
+
+!*** cross sections from Sander et al. [2003]
+
+      !fil = trim(datafile)//'cross_sections/ho2_jpl2003.txt'
+      fil = trim(datapath)//'CrossSections/HO2/ho2_jpl2003.txt'
+      !print*, 'section efficace HO2: ', fil
+
+      OPEN(kin,FILE=fil,STATUS='OLD')
+      READ(kin,*) n
+      DO i = 1, n
+        READ(kin,*) x1(i), y1(i)
+      ENDDO
+      CLOSE(kin)
+
+      CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,          0.,0.)
+      CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,        1E38,0.)
+
+      CALL inter2(nw,wl,yg,n,x1,y1,ierr)
+
+      IF (ierr .NE. 0) THEN
+        WRITE(*,*) ierr, fil
+        STOP
+      ENDIF
+
+      end subroutine rdxs18ho2
 
 !==============================================================================
 
@@ -2350,6 +2921,170 @@ end subroutine init_photolysis
 
 !==============================================================================
 
+      subroutine rdxs18no2(nw,wl,xs18no2,xs18no2_220,xs18no2_294,yldno2_248, yldno2_298)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  read and grid cross section + quantum yield for N(18O)(16O)                      =*
+!=  photolysis                                                               =*
+!=  Jenouvrier et al., 1996  200-238 nm
+!=  Vandaele et al., 1998    238-666 nm 220K and 294K
+!=  quantum yield from jpl 2006
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!=  WL     - REAL, vector of lower limits of wavelength intervals in      (I)=*
+!=           working wavelength grid                                         =*
+!=  SQ     - REAL, cross section x quantum yield (cm^2) for each          (O)=*
+!=           photolysis reaction defined, at each defined wavelength and     =*
+!=           at each defined altitude level                                  =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      implicit none
+
+!#include "datafile.h"
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower and central wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: xs18no2, xs18no2_220, xs18no2_294 ! no2 cross-sections (cm2)
+      real, dimension(nw) :: yldno2_248, yldno2_298      ! quantum yields at 248-298 k
+
+!     local
+
+      integer, parameter :: kdata = 28000
+      real, parameter :: deltax = 1.e-4
+      real, dimension(kdata) :: x1, x2, x3, x4, x5, y1, y2, y3, y4, y5
+      real, dimension(nw) :: yg1, yg2, yg3, yg4, yg5
+      real :: dum, qy
+      integer :: i, iw, n, n1, n2, n3, n4, n5, ierr
+      character*300 fil
+      integer :: kin, kout ! input/output logical units
+
+      kin = 10
+
+!*************** NO2 photodissociation
+
+!  Jenouvrier 1996 + Vandaele 1998 (JPL 2006)
+
+      !fil = trim(datafile)//'cross_sections/no2_xs_jenouvrier.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_jenouvrier.txt'
+      !print*, 'section efficace NO2: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,status='old')
+      DO i = 1, 3
+         READ(kin,*)
+      ENDDO
+      n1 = 10001
+      DO i = 1, n1
+         READ(kin,*) x1(i), y1(i)
+      end do
+
+      CALL addpnt(x1,y1,kdata,n1,x1(1)*(1.-deltax), 0.)
+      CALL addpnt(x1,y1,kdata,n1,               0., 0.)
+      CALL addpnt(x1,y1,kdata,n1,x1(n1)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n1,           1.e+38, 0.)
+      CALL inter2(nw,wl,yg1,n1,x1,y1,ierr)
+
+      !fil = trim(datafile)//'cross_sections/no2_xs_vandaele_294K.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_vandaele_294K.txt'
+      !print*, 'section efficace NO2: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,status='old')
+      DO i = 1, 3
+         READ(kin,*)
+      ENDDO
+      n2 = 27993
+      DO i = 1, n2
+         READ(kin,*) x2(i), y2(i)
+      end do
+
+      CALL addpnt(x2,y2,kdata,n2,x2(1)*(1.-deltax), 0.)
+      CALL addpnt(x2,y2,kdata,n2,               0., 0.)
+      CALL addpnt(x2,y2,kdata,n2,x2(n2)*(1.+deltax),0.)
+      CALL addpnt(x2,y2,kdata,n2,           1.e+38, 0.)
+      CALL inter2(nw,wl,yg2,n2,x2,y2,ierr)
+
+      !fil = trim(datafile)//'cross_sections/no2_xs_vandaele_220K.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_xs_vandaele_220K.txt'
+      !print*, 'section efficace NO2: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,status='old')
+      DO i = 1, 3
+         READ(kin,*)
+      ENDDO
+      n3 = 27993
+      DO i = 1, n3
+         READ(kin,*) x3(i), y3(i)
+      end do
+
+      CALL addpnt(x3,y3,kdata,n3,x3(1)*(1.-deltax), 0.)
+      CALL addpnt(x3,y3,kdata,n3,               0., 0.)
+      CALL addpnt(x3,y3,kdata,n3,x3(n3)*(1.+deltax),0.)
+      CALL addpnt(x3,y3,kdata,n3,           1.e+38, 0.)
+      CALL inter2(nw,wl,yg3,n3,x3,y3,ierr)
+
+      do iw = 1, nw - 1
+         xs18no2(iw)     = yg1(iw)
+         xs18no2_294(iw) = yg2(iw)
+         xs18no2_220(iw) = yg3(iw)
+      end do
+
+!     photodissociation efficiency from jpl 2006
+
+      !fil = trim(datafile)//'cross_sections/no2_yield_jpl2006.txt'
+      fil = trim(datapath)//'CrossSections/NO2/no2_yield_jpl2006.txt'
+      !print*, 'quantum yield NO2: ', fil
+
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+      DO i = 1, 5
+         READ(kin,*)
+      ENDDO
+      n = 25
+      n4 = n
+      n5 = n
+      DO i = 1, n
+         READ(kin,*) x4(i), y4(i), y5(i)
+         x5(i) = x4(i)
+      ENDDO
+      CLOSE(kin)
+
+      CALL addpnt(x4,y4,kdata,n4,x4(1)*(1.-deltax),y4(1))
+      CALL addpnt(x4,y4,kdata,n4,               0.,y4(1))
+      CALL addpnt(x4,y4,kdata,n4,x4(n4)*(1.+deltax),  0.)
+      CALL addpnt(x4,y4,kdata,n4,           1.e+38,   0.)
+      CALL inter2(nw,wl,yg4,n4,x4,y4,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      CALL addpnt(x5,y5,kdata,n5,x5(1)*(1.-deltax),y5(1))
+      CALL addpnt(x5,y5,kdata,n5,               0.,y5(1))
+      CALL addpnt(x5,y5,kdata,n5,x5(n5)*(1.+deltax),  0.)
+      CALL addpnt(x5,y5,kdata,n5,           1.e+38,   0.)
+      CALL inter2(nw,wl,yg5,n5,x5,y5,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+      do iw = 1, nw - 1
+         yldno2_298(iw) = yg4(iw)
+         yldno2_248(iw) = yg5(iw)
+      end do
+
+      end subroutine rdxs18no2
+
+!==============================================================================
+
       subroutine rdxsno(nw, wl, yg, yieldno)
 
 !-----------------------------------------------------------------------------*
@@ -2436,6 +3171,95 @@ end subroutine init_photolysis
       ENDIF
 
       end subroutine rdxsno
+
+!==============================================================================
+
+      subroutine rdxs18no(nw, wl, yg, yieldno)
+
+!-----------------------------------------------------------------------------*
+!=  PURPOSE:                                                                 =*
+!=  Read N(18O) cross-sections  and photodissociation efficiency                 =*
+!=  Lida et al 1986 (provided by Francisco Gonzalez-Galindo)                 =*
+!-----------------------------------------------------------------------------*
+!=  PARAMETERS:                                                              =*
+!=  NW     - INTEGER, number of specified intervals + 1 in working        (I)=*
+!=           wavelength grid                                                 =*
+!-----------------------------------------------------------------------------*
+
+!      use datafile_mod, only: datadir
+
+      implicit none
+
+!#include "datafile.h"
+
+!     input
+
+      integer :: nw               ! number of wavelength grid points
+      real, dimension(nw) :: wl   ! lower wavelength for each interval
+
+!     output
+
+      real, dimension(nw) :: yg        ! no cross-sections (cm2)
+      real, dimension(nw) :: yieldno   ! no photodissociation efficiency
+
+!     local
+
+      integer, parameter :: kdata = 110
+      real, parameter :: deltax = 1.e-4
+      real, dimension(kdata) :: x1, y1, x2, y2
+      integer :: i, iw, n, ierr
+      character*300 fil
+      integer :: kin, kout ! input/output logical units
+
+      kin = 10
+
+!     no cross-sections
+
+      !fil = trim(datafile)//'cross_sections/no_xs_francisco.txt'
+      fil = trim(datapath)//'CrossSections/NO/no_xs_francisco.txt'
+      !print*, 'section efficace NO: ', fil
+      OPEN(kin,FILE=fil,STATUS='OLD')
+
+      n = 99
+      DO i = 1, n
+        READ(kin,*) x1(i), y1(i)
+      ENDDO
+      CLOSE(kin)
+
+      CALL addpnt(x1,y1,kdata,n,x1(1)*(1.-deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,          0.,0.)
+      CALL addpnt(x1,y1,kdata,n,x1(n)*(1.+deltax),0.)
+      CALL addpnt(x1,y1,kdata,n,        1E38,0.)
+
+      CALL inter2(nw,wl,yg,n,x1,y1,ierr)
+      IF (ierr .NE. 0) THEN
+         WRITE(*,*) ierr, fil
+         STOP
+      ENDIF
+
+!     photodissociation yield
+
+      !fil = trim(datafile)//'cross_sections/noefdis.txt'
+      fil = trim(datapath)//'CrossSections/NO/noefdis.txt'
+      OPEN(UNIT=kin,FILE=fil,STATUS='old')
+
+      n = 33
+      DO i = 1, n
+         READ(kin,*) x2(n-i+1), y2(n-i+1)
+      END DO
+      CLOSE (kin)
+
+      CALL addpnt(x2,y2,kdata,n,x2(1)*(1.-deltax),0.)
+      CALL addpnt(x2,y2,kdata,n,          0.,0.)
+      CALL addpnt(x2,y2,kdata,n,x2(n)*(1.+deltax),1.)
+      CALL addpnt(x2,y2,kdata,n,      1.e+38,1.)
+      CALL inter2(nw,wl,yieldno,n,x2,y2,ierr)
+      IF (ierr .NE. 0) THEN
+        WRITE(*,*) ierr, fil
+        STOP
+      ENDIF
+
+      end subroutine rdxs18no
 
 !==============================================================================
 

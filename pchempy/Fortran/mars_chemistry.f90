@@ -53,7 +53,7 @@ MODULE mars_chemistry
         endif
 
         if(o18_chemistry)then
-            nreactions = nreactions + 2
+            nreactions = nreactions + 3
 
             if(nitrogen_chemistry)then
                 nreactions = nreactions + 1
@@ -110,12 +110,13 @@ MODULE mars_chemistry
 
         double precision, dimension(nlay) :: e001, e002                          !carbon reactions
         double precision, dimension(nlay) :: g001, g002, g003                    !carbon-13 reactions
-        double precision, dimension(nlay) :: h001, h002, h003                    !oxygen-18 reactions
+        double precision, dimension(nlay) :: h001, h001_2, h002, h002_2, h003    !oxygen-18 reactions
 
         double precision :: dens(nlay),co2(nlay),o2(nlay),o(nlay),n2(nlay)
         integer :: ilay
         double precision :: ak0, ak1, xpo, rate, rate1, rate2
         double precision :: k0,kinf,kint,kf,kca
+        double precision :: o18ratio_oh   !(18O)/(16O) ratio in OH to tweak the model 
 
 
         !Output
@@ -124,6 +125,10 @@ MODULE mars_chemistry
         integer, intent(out) :: ns(nreactions),sID(2,nreactions),sISO(2,nreactions)
         integer, intent(out) :: npr(nreactions),pID(2,nreactions),pISO(2,nreactions)
         real, intent(out) :: sf(2,nreactions),pf(2,nreactions)
+
+
+        !Input to tweak the O18 chemistry
+        o18ratio_oh = 1.048
 
 
         !Adding the reactions
@@ -1366,7 +1371,15 @@ MODULE mars_chemistry
             
         end do
 
-        rrates(:,i0) = e001(:)
+        if(o18_chemistry)then
+            !Tweaking the model to account for constant (18O)/(16O) ratio in OH
+            !This reaction is for (16O)H
+            rrates(:,i0) = e001(:)/(1.d0+o18ratio_oh*2005.20d-6)
+
+        else
+            rrates(:,i0) = e001(:)
+        endif
+        
         rtype(i0) = 3
 
         ns(i0) = 2
@@ -1537,7 +1550,10 @@ MODULE mars_chemistry
 
             h001(:) = e001(:)*(1.01195 - 4.443404e-8*P(:) + 1.938355e-13*P(:)**2.)
 
-            rrates(:,i0) = h001(:)
+            !rrates(:,i0) = h001(:)
+            !We assume that the (18O)/(16O) ratio is constant and we adapt the reaction rate for it
+            rrates(:,i0) = h001(:)/(1.d0+o18ratio_oh*2005.20d-6)
+
             rtype(i0) = 3
     
             ns(i0) = 2
@@ -1579,6 +1595,37 @@ MODULE mars_chemistry
             pID(1,i0) = 2
             pISO(1,i0) = 3
             pf(1,i0) = 1.0
+
+
+            !=========================================================================================
+            !---h001_2: (18o)h + c(16o) -> (18o)(12c)(16o) + h
+
+            !Assumed to be the same as e001, but tweaking the model to compute the rate from (16O)H.
+            !The tweak is to assume the rate is lower by a factor of (18O)/(16O), which represents the
+            !O isotopic ratio in OH (here we assume it follows the value from Curiosity in CO2 = 1.046 VSMOW)
+
+            i0 = i0 + 1
+
+            h001_2(:) = e001(:)*(o18ratio_oh*2005.20d-6)/(1.d0+o18ratio_oh*2005.20d-6)
+
+            rrates(:,i0) = h001_2(:)
+            rtype(i0) = 3
+    
+            ns(i0) = 2
+            sID(1,i0) = 13
+            sISO(1,i0) = 0
+            sf(1,i0) = 1.0
+            sID(2,i0) = 5
+            sISO(2,i0) = 0
+            sf(2,i0) = 1.0
+    
+            npr(i0) = 2
+            pID(1,i0) = 2
+            pISO(1,i0) = 3
+            pf(1,i0) = 1.0
+            pID(2,i0) = 48
+            pISO(2,i0) = 0
+            pf(2,i0) = 1.0
 
 
             if(nitrogen_chemistry)then

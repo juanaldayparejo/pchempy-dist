@@ -59,7 +59,7 @@ nt = len(ztime)
 
 #Using the last timestep as the initial condition for the model
 Nlay = np.zeros((nlay,ngas),dtype='float64')
-Nlay[:,:] = Nlay1[:,:,nt-1]
+Nlay[:,:] = Nlay1[:,:,0]
 
 #Calculating VMRs and total density
 N0lay = np.sum(Nlay,axis=1)
