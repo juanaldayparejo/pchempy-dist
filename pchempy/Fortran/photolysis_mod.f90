@@ -75,10 +75,11 @@ contains
             ! mopt = 1 high-resolution
             ! mopt = 2 low-resolution (recommended for gcm use)
             
-            mopt = 1
-
-            integer, intent(in) :: ngas_phot,gasID_phot(ngas_phot),isoID_phot(ngas_phot)
+            integer, intent(in) :: ngas_phot                    ! number of active species
+            integer, intent(in) :: gasID_phot(ngas_phot),isoID_phot(ngas_phot)   ! ID of the active gases 
             integer :: igas
+
+            mopt = 1
 
             ! set wavelength grid
             call gridw(nw,wl,wc,wu,mopt)
@@ -154,7 +155,7 @@ contains
                   elseif((gasID_phot(igas).eq.7).and.(gasID_phot(igas).eq.2))then
 
                         ! read and grid (18o)(16o) cross-sections
-                        call rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yield18o2)
+                        call rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yieldo2)
             
                   elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.3))then
 
@@ -1939,7 +1940,7 @@ contains
          STOP
       ENDIF
 
-      end subroutine rdxso2
+      end subroutine rdxs18o2
 
 
 !==============================================================================

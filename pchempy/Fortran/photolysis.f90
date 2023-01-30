@@ -40,7 +40,7 @@ MODULE photolysis
         integer, intent(in) :: ngas                         ! number of species in the chemistry
         integer, intent(in) :: gasID(ngas),isoID(ngas)      ! ID of the gases in the atmosphere
         integer, intent(in) :: ngas_phot                    ! number of active species
-        integer, intent(in) :: gasID_phot(ngas),isoID_phot(ngas)   ! ID of the active gases 
+        integer, intent(in) :: gasID_phot(ngas_phot),isoID_phot(ngas_phot)   ! ID of the active gases 
         real, intent(in) :: h(nlay)                         ! Altitude (m)
         real, intent(in) :: T(nlay)                         ! Temperature (K)
         double precision, intent(in) :: cdens(nlay,ngas)    ! column density of each species (m-2)
