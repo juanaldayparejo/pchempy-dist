@@ -92,102 +92,102 @@ contains
             
             do igas=1,ngas_phot
 
-                  if((gasID_phot(igas).eq.7).and.(gasID_phot(igas).eq.0))then
+                  if((gasID_phot(igas).eq.7).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid o2 cross-sections
                         call rdxso2(nw,wl,xso2_150,xso2_200,xso2_250,xso2_300,yieldo2)
              
-                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.0))then
                         
                         ! read and grid co2 cross-sections
                         call rdxsco2(nw,wl,xsco2_195,xsco2_295,xsco2_370,yieldco2)
             
-                  elseif((gasID_phot(igas).eq.3).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.3).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid o3 cross-sections
                         call rdxso3(nw,wl,xso3_218,xso3_298)
              
-                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid h2o cross-sections
                         call rdxsh2o(nw,wl,xsh2o)
             
-                  elseif((gasID_phot(igas).eq.25).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.25).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid h2o2 cross-sections
                         call rdxsh2o2(nw,wl,xsh2o2)
             
-                  elseif((gasID_phot(igas).eq.44).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.44).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid ho2 cross-sections
                         call rdxsho2(nw,wl,xsho2)
             
-                  elseif((gasID_phot(igas).eq.39).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.39).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid h2 cross-sections
                         call rdxsh2(nw,wl,wc,xsh2,yieldh2)
             
-                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.4))then
+                  elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.4))then
 
                         ! read and grid hdo cross-sections
                         call rdxshdo(nw,wl,xshdo)
 
-                  elseif((gasID_phot(igas).eq.8).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.8).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid no cross-sections
                         call rdxsno(nw,wl,xsno,yieldno)
             
-                  elseif((gasID_phot(igas).eq.10).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.10).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid no2 cross-sections
                         call rdxsno2(nw,wl,xsno2,xsno2_220,xsno2_294,yldno2_248,yldno2_298)
             
-                  elseif((gasID_phot(igas).eq.22).and.(gasID_phot(igas).eq.0))then
+                  elseif((gasID_phot(igas).eq.22).and.(isoID_phot(igas).eq.0))then
 
                         ! read and grid n2 cross-sections
                         call rdxsn2(nw,wl,xsn2,yieldn2)
 
-                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.2))then
 
                         ! read and grid (13C)(16O)2 cross-sections
                         call rdxs13co2(nw,wl,xs13co2_195,xs13co2_295,xs13co2_370,yieldco2)
 
-                  elseif((gasID_phot(igas).eq.7).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.7).and.(isoID_phot(igas).eq.2))then
 
                         ! read and grid (18o)(16o) cross-sections
                         call rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yieldo2)
             
-                  elseif((gasID_phot(igas).eq.2).and.(gasID_phot(igas).eq.3))then
+                  elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.3))then
 
                         ! read and grid (18O)(12C)(16O) cross-sections
                         call rdxs18co2(nw,wl,xs18co2_195,xs18co2_295,xs18co2_370,yieldco2)
             
-                  elseif((gasID_phot(igas).eq.3).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.3).and.(isoID_phot(igas).eq.2))then
 
                         ! read and grid (18O)(16O)2 cross-sections
                         call rdxs18o3(nw,wl,xs18o3_218,xs18o3_298)
             
-                  elseif((gasID_phot(igas).eq.1).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.2))then
 
                         ! read and grid h2(18o) cross-sections
                         call rdxs18h2o(nw,wl,xs18h2o)
 
-                  elseif((gasID_phot(igas).eq.25).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.25).and.(isoID_phot(igas).eq.2))then
             
                         ! read and grid h2(18o)(16o) cross-sections
                         call rdxs18h2o2(nw,wl,xs18h2o2)
             
-                  elseif((gasID_phot(igas).eq.44).and.(gasID_phot(igas).eq.2))then
+                  elseif((gasID_phot(igas).eq.44).and.(isoID_phot(igas).eq.2))then
 
                         ! read and grid h(18o)(16o) cross-sections
                         call rdxs18ho2(nw,wl,xs18ho2)
 
-                  elseif((gasID_phot(igas).eq.8).and.(gasID_phot(igas).eq.3))then
+                  elseif((gasID_phot(igas).eq.8).and.(isoID_phot(igas).eq.3))then
 
                         ! read and grid no cross-sections
                         call rdxs18no(nw,wl,xs18no,yieldno)
             
-                  elseif((gasID_phot(igas).eq.10).and.(gasID_phot(igas).eq.3))then
+                  elseif((gasID_phot(igas).eq.10).and.(isoID_phot(igas).eq.3))then
 
                         ! read and grid no2 cross-sections
                         call rdxs18no2(nw,wl,xs18no2,xs18no2_220,xs18no2_294,yldno2_248,yldno2_298)
