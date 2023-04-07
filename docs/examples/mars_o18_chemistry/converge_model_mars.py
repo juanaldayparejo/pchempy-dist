@@ -21,8 +21,8 @@ runname = input('runname :: ')
 diffusion = True
 chemistry = True
 nitrogen_chemistry = False
-c13_chemistry = True
-o18_chemistry = False
+c13_chemistry = False
+o18_chemistry = True
 
 
 #Photolysis
@@ -52,6 +52,7 @@ st = time.time()
 
 #Reading the HDF5 file
 hlay,Tlay,gasID,isoID,Nlay1,ztime = read_hdf5(runname)
+
 nlay = Nlay1.shape[0]
 ngas = Nlay1.shape[1]
 nt = len(ztime)
