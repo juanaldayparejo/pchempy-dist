@@ -1,0 +1,9 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+  - family-names: Juan
+    given-names: Alday
+    orcid: https://orcid.org/0000-0003-1459-3444
+title: pchempy: A 1D Photochemical Model with Isotopic Fractionation for the atmosphere of Mars
+version: v1.0
+date-released: 2023-04-07
