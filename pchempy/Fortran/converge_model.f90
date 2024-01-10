@@ -140,9 +140,8 @@ subroutine converge_model_mars_rosenbrock(nlay,ngas,h,P,T,N,gasID,isoID,mmol,A,s
 
         !calculating the photolysis rates 
         call photolysis_online(nlay, ngas, ngas_phot, gasID, isoID, gasID_phot, isoID_phot, &
-                                h, T, cdens, sza, tauvis, dist_sun, &
-                                n_photolysis, rtypep, nsp, sIDp, sISOp, sfp, nprp, pIDp, pISOp, pfp, rratesp)
-
+                                h, T, cdens, sza, tauvis, dist_sun, n_photolysis, &
+                                rtypep, nsp, sIDp, sISOp, sfp, nprp, pIDp, pISOp, pfp, rratesp)
 
         !mapping the photolysis reactions into the overall reaction array
         rtype(1:n_photolysis) = rtypep(1:n_photolysis)
@@ -224,8 +223,8 @@ subroutine converge_model_mars_rosenbrock(nlay,ngas,h,P,T,N,gasID,isoID,mmol,A,s
 
                 !calculating the photolysis rates 
                 call photolysis_online(nlay, ngas, ngas_phot, gasID, isoID, gasID_phot, isoID_phot, &
-                                        h, T, cdens, sza, tauvis, dist_sun, &
-                                        n_photolysis, rtypep, nsp, sIDp, sISOp, sfp, nprp, pIDp, pISOp, pfp, rratesp)
+                                        h, T, cdens, sza, tauvis, dist_sun, n_photolysis, &
+                                        rtypep, nsp, sIDp, sISOp, sfp, nprp, pIDp, pISOp, pfp, rratesp)
 
 
                 !mapping the photolysis reactions into the overall reaction array
