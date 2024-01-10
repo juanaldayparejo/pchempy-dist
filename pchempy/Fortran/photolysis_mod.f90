@@ -5,61 +5,62 @@ module photolysis_mod
       include 'datapath.h'
 
       ! photolysis
-
-      integer, save :: nphot = 15             ! number of photolysis
-                                                ! is incremented by +2 in calchim if deuterium chemisty)
-      integer, parameter :: nabs  = 14        ! number of absorbing gases
+      !integer, save :: nphot = 15             ! number of photolysis
+      !integer, parameter :: nabs  = 14        ! number of absorbing gases
 
       ! spectral grid
-
-      !  integer, parameter :: nw = 162          ! number of spectral intervals (low-res)
-      integer, parameter :: nw = 3789
-      integer, save :: mopt                   ! high-res/low-res switch
-
-      real, dimension(nw), save :: wl, wc, wu ! lower, center, upper wavelength for each interval
+      integer, parameter :: nw = 3789                            ! number of spectral intervals (3789, 162)
+      real, allocatable, save :: wl(:), wc(:), wu(:)             ! lower, center, upper wavelength for each interval
 
       ! solar flux
-
-      real, dimension(nw), save :: f          !  solar flux (w.m-2.nm-1) at 1 au
-
+      integer, save :: msun
+      real, allocatable, save :: f(:)    !  solar flux (w.m-2.nm-1) at 1 au
+      
       ! datafile
       character(len=300),save :: datafile
       character(len=300),save :: datafile1,datafile2
 
-      ! cross-sections and quantum yields
+      !main isotope cross sections and phoyolytic yields
+      real, allocatable, save :: xsco2_195(:), xsco2_295(:), xsco2_370(:)            ! co2 absorption cross-section at 195-295-370 k (cm2)
+      real, allocatable, save :: yieldco2(:)                                         ! co2 photodissociation yield
+      real, allocatable, save :: xso2_150(:), xso2_200(:), xso2_250(:), xso2_300(:)  ! o2 absorption cross-section at 150-200-250-300 k (cm2)
+      real, allocatable, save :: yieldo2(:)                                          ! o2 photodissociation yield
+      real, allocatable, save :: xso3_218(:), xso3_298(:)                            ! o3 absorption cross-section at 218-298 k (cm2)
+      real, allocatable, save :: xsh2o(:)                                            ! h2o absorption cross-section (cm2)
+      real, allocatable, save :: xsh2o2(:)                                           ! h2o2 absorption cross-section (cm2)
+      real, allocatable, save :: xsho2(:)                                            ! ho2 absorption cross-section (cm2)
+      real, allocatable, save :: xsh2(:)                                             ! h2 absorption cross-section (cm2)
+      real, allocatable, save :: yieldh2(:)                                          ! h2 photodissociation yield
+      real, allocatable, save :: xsno2(:), xsno2_220(:), xsno2_294(:)                ! no2 absorption cross-section at 220-294 k (cm2)
+      real, allocatable, save :: yldno2_248(:), yldno2_298(:)                        ! no2 quantum yield at 248-298 k
+      real, allocatable, save :: xsno(:)                                             ! no absorption cross-section (cm2)
+      real, allocatable, save :: yieldno(:)                                          ! no photodissociation yield
+      real, allocatable, save :: yieldn2(:)                                          ! n2 photodissociation yield
+      real, allocatable, save :: xsn2(:)                                             ! n2 absorption cross-section (cm2)
+      real, allocatable, save :: albedo(:)                                           ! surface albedo
 
-      real, dimension(nw), save :: xsco2_195, xsco2_295, xsco2_370                ! co2 absorption cross-section at 195-295-370 k (cm2)
-      real, dimension(nw), save :: yieldco2                                       ! co2 photodissociation yield
-      real, dimension(nw), save :: xs13co2_195, xs13co2_295, xs13co2_370          ! (13c)(16o)2 absorption cross-section at 195-295-370 k (cm2)
-      real, dimension(nw), save :: xs18co2_195, xs18co2_295, xs18co2_370          ! (18o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
-      real, dimension(nw), save :: xs17co2_195, xs17co2_295, xs17co2_370          ! (17o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
-      real, dimension(nw), save :: xso2_150, xso2_200, xso2_250, xso2_300         ! o2 absorption cross-section at 150-200-250-300 k (cm2)
-      real, dimension(nw), save :: xs18o2_150, xs18o2_200, xs18o2_250, xs18o2_300 ! (18o)(16o) absorption cross-section at 150-200-250-300 k (cm2)
-      real, dimension(nw), save :: yieldo2                                        ! o2 photodissociation yield
-      real, dimension(nw), save :: xso3_218, xso3_298                             ! o3 absorption cross-section at 218-298 k (cm2)
-      real, dimension(nw), save :: xs18o3_218, xs18o3_298                         ! (18o)(16o)2 absorption cross-section at 218-298 k (cm2)
-      real, dimension(nw), save :: xsh2o                                          ! h2o absorption cross-section (cm2)
-      real, dimension(nw), save :: xs18h2o                                        ! h2(18o) absorption cross-section (cm2)
-      real, dimension(nw), save :: xsh2o2                                         ! h2o2 absorption cross-section (cm2)
-      real, dimension(nw), save :: xs18h2o2                                       ! h2(18o)(16o) absorption cross-section (cm2)
-      real, dimension(nw), save :: xsho2                                          ! ho2 absorption cross-section (cm2)
-      real, dimension(nw), save :: xs18ho2                                        ! h(18o)(16o) absorption cross-section (cm2)
-      real, dimension(nw), save :: xsh2                                           ! h2 absorption cross-section (cm2)
-      real, dimension(nw), save :: yieldh2                                        ! h2 photodissociation yield
-      real, dimension(nw), save :: xsno2, xsno2_220, xsno2_294                    ! no2 absorption cross-section at 220-294 k (cm2)
-      real, dimension(nw), save :: xs18no2, xs18no2_220, xs18no2_294              ! n(18o)(16o) absorption cross-section at 220-294 k (cm2)
-      real, dimension(nw), save :: yldno2_248, yldno2_298                         ! no2 quantum yield at 248-298 k
-      real, dimension(nw), save :: xsno                                           ! no absorption cross-section (cm2)
-      real, dimension(nw), save :: xs18no                                           ! n(18o) absorption cross-section (cm2)
-      real, dimension(nw), save :: yieldno                                        ! no photodissociation yield
-      real, dimension(nw), save :: xsn2                                           ! n2 absorption cross-section (cm2)
-      real, dimension(nw), save :: yieldn2                                        ! n2 photodissociation yield
-      real, dimension(nw), save :: xshdo                                          ! hdo absorption cross-section (cm2)
-      real, dimension(nw), save :: albedo                                         ! surface albedo
+      !d isotopes
+      real, allocatable, save :: xshdo(:)                                            ! hdo absorption cross-section (cm2)
+
+      !13c isotopes
+      real, allocatable, save :: xs13co2_195(:), xs13co2_295(:), xs13co2_370(:)      ! (13c)(16o)2 absorption cross-section at 195-295-370 k (cm2)
+
+      !18o isotopes
+      real, allocatable, save :: xs18co2_195(:), xs18co2_295(:), xs18co2_370(:)      ! (18o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
+      real, allocatable, save :: xs18o2_150(:), xs18o2_200(:), xs18o2_250(:), xs18o2_300(:) ! (18o)(16o) absorption cross-section at 150-200-250-300 k (cm2)
+      real, allocatable, save :: xs18o3_218(:), xs18o3_298(:)                        ! (18o)(16o)2 absorption cross-section at 218-298 k (cm2)
+      real, allocatable, save :: xs18h2o(:)                                          ! h2(18o) absorption cross-section (cm2)
+      real, allocatable, save :: xs18h2o2(:)                                         ! h2(18o)(16o) absorption cross-section (cm2)
+      real, allocatable, save :: xs18ho2(:)                                          ! h(18o)(16o) absorption cross-section (cm2)
+      real, allocatable, save :: xs18no2(:), xs18no2_220(:), xs18no2_294(:)          ! n(18o)(16o) absorption cross-section at 220-294 k (cm2)
+      real, allocatable, save :: xs18no(:)                                           ! n(18o) absorption cross-section (cm2)
+
+      !17o isotopes
+      real, allocatable, save :: xs17co2_195(:), xs17co2_295(:), xs17co2_370(:)      ! (17o)(12c)(16o) absorption cross-section at 195-295-370 k (cm2)
 
 contains
 
-      subroutine init_photolysis(ngas_phot,gasID_phot,isoID_phot)
+      subroutine init_photolysis(ngas_phot,gasID_phot,isoID_phot,mopt)
       
             !Routine to read the photolysis cross sections of all species
 
@@ -69,6 +70,7 @@ contains
             !ngas_phot :: Number of active gases
             !gasID_phot(ngas_phot) :: ID of the active gases
             !isoID_phot(ngas_phot) :: Isotope ID of the gases
+            !mopt :: Integer indicating the spectral resolution
 
             ! initialise on-line photolysis
 
@@ -77,117 +79,167 @@ contains
             
             integer, intent(in) :: ngas_phot                    ! number of active species
             integer, intent(in) :: gasID_phot(ngas_phot),isoID_phot(ngas_phot)   ! ID of the active gases 
+            integer, intent(in) :: mopt     !Integer indicating the spectral resolution 
             integer :: igas
 
-            mopt = 1
+            msun = 18
+
+            !if (mopt == 1) then
+            !      nw = 3789
+            !elseif (mopt == 2) then
+            !      nw = 162
+            !endif
 
             ! set wavelength grid
-            call gridw(nw,wl,wc,wu,mopt)
-            
+            allocate(wl(nw),wc(nw),wu(nw))
+            call gridw(mopt,nw,wl,wc,wu)
+
             ! read and grid solar flux data
-            call rdsolarflux(nw,wl,wc,f)
-            
+            allocate(f(nw))
+            call rdsolarflux(nw,wl,wc,msun,f)
+
             ! set surface albedo
+            allocate(albedo(nw))
             call setalb(nw,wl,albedo)
-            
+
             do igas=1,ngas_phot
 
                   if((gasID_phot(igas).eq.7).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xso2_150(nw),xso2_200(nw),xso2_250(nw),xso2_300(nw),yieldo2(nw))
 
                         ! read and grid o2 cross-sections
                         call rdxso2(nw,wl,xso2_150,xso2_200,xso2_250,xso2_300,yieldo2)
              
                   elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.0))then
                         
+                        allocate(xsco2_195(nw),xsco2_295(nw),xsco2_370(nw),yieldco2(nw))
+
                         ! read and grid co2 cross-sections
                         call rdxsco2(nw,wl,xsco2_195,xsco2_295,xsco2_370,yieldco2)
             
                   elseif((gasID_phot(igas).eq.3).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xso3_218(nw),xso3_298(nw))
 
                         ! read and grid o3 cross-sections
                         call rdxso3(nw,wl,xso3_218,xso3_298)
              
                   elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.0))then
 
+                        allocate(xsh2o(nw))
+
                         ! read and grid h2o cross-sections
                         call rdxsh2o(nw,wl,xsh2o)
             
                   elseif((gasID_phot(igas).eq.25).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xsh2o2(nw))
 
                         ! read and grid h2o2 cross-sections
                         call rdxsh2o2(nw,wl,xsh2o2)
             
                   elseif((gasID_phot(igas).eq.44).and.(isoID_phot(igas).eq.0))then
 
+                        allocate(xsho2(nw))
+
                         ! read and grid ho2 cross-sections
                         call rdxsho2(nw,wl,xsho2)
             
                   elseif((gasID_phot(igas).eq.39).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xsh2(nw),yieldh2(nw))
 
                         ! read and grid h2 cross-sections
                         call rdxsh2(nw,wl,wc,xsh2,yieldh2)
             
                   elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.4))then
 
+                        allocate(xshdo(nw))
+
                         ! read and grid hdo cross-sections
                         call rdxshdo(nw,wl,xshdo)
 
                   elseif((gasID_phot(igas).eq.8).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xsno(nw),yieldno(nw))
 
                         ! read and grid no cross-sections
                         call rdxsno(nw,wl,xsno,yieldno)
             
                   elseif((gasID_phot(igas).eq.10).and.(isoID_phot(igas).eq.0))then
 
+                        allocate(xsno2(nw),xsno2_220(nw),xsno2_294(nw),yldno2_248(nw),yldno2_298(nw))
+
                         ! read and grid no2 cross-sections
                         call rdxsno2(nw,wl,xsno2,xsno2_220,xsno2_294,yldno2_248,yldno2_298)
             
                   elseif((gasID_phot(igas).eq.22).and.(isoID_phot(igas).eq.0))then
+
+                        allocate(xsn2(nw),yieldn2(nw))
 
                         ! read and grid n2 cross-sections
                         call rdxsn2(nw,wl,xsn2,yieldn2)
 
                   elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.2))then
 
+                        allocate(xs13co2_195(nw),xs13co2_295(nw),xs13co2_370(nw))
+
                         ! read and grid (13C)(16O)2 cross-sections
                         call rdxs13co2(nw,wl,xs13co2_195,xs13co2_295,xs13co2_370,yieldco2)
 
                   elseif((gasID_phot(igas).eq.7).and.(isoID_phot(igas).eq.2))then
+
+                        allocate(xs18o2_150(nw),xs18o2_200(nw),xs18o2_250(nw),xs18o2_300(nw),yieldo2(nw))
 
                         ! read and grid (18o)(16o) cross-sections
                         call rdxs18o2(nw,wl,xs18o2_150,xs18o2_200,xs18o2_250,xs18o2_300,yieldo2)
             
                   elseif((gasID_phot(igas).eq.2).and.(isoID_phot(igas).eq.3))then
 
+                        allocate(xs18co2_195(nw),xs18co2_295(nw),xs18co2_370(nw))
+
                         ! read and grid (18O)(12C)(16O) cross-sections
                         call rdxs18co2(nw,wl,xs18co2_195,xs18co2_295,xs18co2_370,yieldco2)
             
                   elseif((gasID_phot(igas).eq.3).and.(isoID_phot(igas).eq.2))then
+
+                        allocate(xs18o3_218(nw),xs18o3_298(nw))
 
                         ! read and grid (18O)(16O)2 cross-sections
                         call rdxs18o3(nw,wl,xs18o3_218,xs18o3_298)
             
                   elseif((gasID_phot(igas).eq.1).and.(isoID_phot(igas).eq.2))then
 
+                        allocate(xs18h2o(nw))
+
                         ! read and grid h2(18o) cross-sections
                         call rdxs18h2o(nw,wl,xs18h2o)
 
                   elseif((gasID_phot(igas).eq.25).and.(isoID_phot(igas).eq.2))then
             
+                        allocate(xs18h2o2(nw))
+
                         ! read and grid h2(18o)(16o) cross-sections
                         call rdxs18h2o2(nw,wl,xs18h2o2)
             
                   elseif((gasID_phot(igas).eq.44).and.(isoID_phot(igas).eq.2))then
+
+                        allocate(xs18ho2(nw))
 
                         ! read and grid h(18o)(16o) cross-sections
                         call rdxs18ho2(nw,wl,xs18ho2)
 
                   elseif((gasID_phot(igas).eq.8).and.(isoID_phot(igas).eq.3))then
 
+                        allocate(xs18no(nw))
+
                         ! read and grid no cross-sections
                         call rdxs18no(nw,wl,xs18no,yieldno)
             
                   elseif((gasID_phot(igas).eq.10).and.(isoID_phot(igas).eq.3))then
+
+                        allocate(xs18no2(nw),xs18no2_220(nw),xs18no2_294(nw))
 
                         ! read and grid no2 cross-sections
                         call rdxs18no2(nw,wl,xs18no2,xs18no2_220,xs18no2_294,yldno2_248,yldno2_298)
@@ -198,29 +250,14 @@ contains
 
       end subroutine init_photolysis
 
+
 !==============================================================================
 
-      subroutine gridw(nw,wl,wc,wu,mopt)
+      subroutine gridw(mopt,nw,wl,wc,wu)
 
 !     Create the wavelength grid for all interpolations and radiative transfer
 !     calculations.  Grid may be irregularly spaced.  Wavelengths are in nm.
 !     No gaps are allowed within the wavelength grid.
-
-      implicit none
-
-!     input
-
-      integer :: nw      ! number of wavelength grid points
-      integer :: mopt    ! high-res/low-res switch
-
-!     output
-
-      real, dimension(nw) :: wl, wc, wu   ! lower, center, upper wavelength for each interval
-
-!     local
-
-      real :: wincr    ! wavelength increment
-      integer :: iw, kw
 
 !     mopt = 1    high-resolution mode (3789 intervals)
 !
@@ -231,7 +268,7 @@ contains
 !                 205-365 nm :  0.5  nm
 !                 365-850 nm :  5.0  nm
 !
-!     mopt = 2    low-resolution mode
+!     mopt = 2    low-resolution mode (162 intervals)
 !
 !                    0-60 nm :  6.0 nm
 !                   60-80 nm :  2.0 nm
@@ -246,196 +283,213 @@ contains
 !                 245-415 nm : 10.0 nm
 !                 415-815 nm : 50.0 nm
 
+
+      implicit none
+
+!     input
+
+      integer, intent(in) :: mopt    ! high-res/low-res switch
+      integer, intent(in) :: nw
+
+!     output
+      real, dimension(nw), intent(out) :: wl, wc, wu   ! lower, center, upper wavelength for each interval
+
+!     local
+
+      real :: wincr    ! wavelength increment
+      integer :: iw, kw
+
+
       if (mopt == 1) then   ! high-res
 
-! define wavelength intervals of width 1.0 nm from 0 to 108 nm:
+            ! define wavelength intervals of width 1.0 nm from 0 to 108 nm:
 
-      kw = 0
-      wincr = 1.0
-      do iw = 0, 107
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
+            kw = 0
+            wincr = 1.0
+            do iw = 0, 107
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
 
-! define wavelength intervals of width 0.1 nm from 108 to 124 nm:
+            ! define wavelength intervals of width 0.1 nm from 108 to 124 nm:
 
-      wincr = 0.1
-      do iw = 1080, 1239, 1
-        kw = kw + 1
-        wl(kw) = real(iw)/10.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
+            wincr = 0.1
+            do iw = 1080, 1239, 1
+            kw = kw + 1
+            wl(kw) = real(iw)/10.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
 
-! define wavelength intervals of width 0.5 nm from 124 to 175 nm:
+            ! define wavelength intervals of width 0.5 nm from 124 to 175 nm:
 
-      wincr = 0.5
-      do iw = 1240, 1745, 5
-        kw = kw + 1
-        wl(kw) = real(iw)/10.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
+            wincr = 0.5
+            do iw = 1240, 1745, 5
+            kw = kw + 1
+            wl(kw) = real(iw)/10.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
 
-! define wavelength intervals of width 0.01 nm from 175 to 205 nm:
+            ! define wavelength intervals of width 0.01 nm from 175 to 205 nm:
 
-      wincr = 0.01
-      do iw = 17500, 20499, 1
-        kw = kw + 1
-        wl(kw) = real(iw)/100.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
+            wincr = 0.01
+            do iw = 17500, 20499, 1
+            kw = kw + 1
+            wl(kw) = real(iw)/100.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
 
-! define wavelength intervals of width 0.5 nm from 205 to 365 nm:
+            ! define wavelength intervals of width 0.5 nm from 205 to 365 nm:
 
-      wincr = 0.5
-      do iw = 2050, 3645, 5
-        kw = kw + 1
-        wl(kw) = real(iw)/10.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
+            wincr = 0.5
+            do iw = 2050, 3645, 5
+            kw = kw + 1
+            wl(kw) = real(iw)/10.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
 
-! define wavelength intervals of width 5.0 nm from 365 to 855 nm:
+            ! define wavelength intervals of width 5.0 nm from 365 to 855 nm:
 
-      wincr = 5.0
-      do iw = 365, 850, 5
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      end do
-      wl(kw+1) = wu(kw)
+            wincr = 5.0
+            do iw = 365, 850, 5
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            end do
+            wl(kw+1) = wu(kw)
 
 !============================================================
 
       else if (mopt == 2) then   ! low-res
 
-! define wavelength intervals of width 6.0 nm from 0 to 60 nm:
+            ! define wavelength intervals of width 6.0 nm from 0 to 60 nm:
 
-      kw = 0
-      wincr = 6.0
-      DO iw = 0, 54, 6
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      END DO
+            kw = 0
+            wincr = 6.0
+            DO iw = 0, 54, 6
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            END DO
 
-! define wavelength intervals of width 2.0 nm from 60 to 80 nm:
+            ! define wavelength intervals of width 2.0 nm from 60 to 80 nm:
 
-      wincr = 2.0
-      DO iw = 60, 78, 2
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      END DO
+            wincr = 2.0
+            DO iw = 60, 78, 2
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            END DO
 
-! define wavelength intervals of width 5.0 nm from 80 to 85 nm:
+            ! define wavelength intervals of width 5.0 nm from 80 to 85 nm:
 
-      wincr = 5.0
-      DO iw = 80, 80
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      END DO
+            wincr = 5.0
+            DO iw = 80, 80
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            END DO
 
-! define wavelength intervals of width 2.0 nm from 85 to 117 nm:
+            ! define wavelength intervals of width 2.0 nm from 85 to 117 nm:
 
-      wincr = 2.0
-      DO iw = 85, 115, 2
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      END DO
+            wincr = 2.0
+            DO iw = 85, 115, 2
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            END DO
 
-! define wavelength intervals of width 3.0 nm from 117 to 120 nm:
+            ! define wavelength intervals of width 3.0 nm from 117 to 120 nm:
 
-      wincr = 3.0
-      DO iw = 117, 117
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      END DO
+            wincr = 3.0
+            DO iw = 117, 117
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            END DO
 
-! define wavelength intervals of width 0.2 nm from 120 to 123 nm:
+            ! define wavelength intervals of width 0.2 nm from 120 to 123 nm:
 
-      wincr = 0.2
-      DO iw = 1200, 1228, 2
-        kw = kw + 1
-        wl(kw) = real(iw)/10.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 0.2
+            DO iw = 1200, 1228, 2
+            kw = kw + 1
+            wl(kw) = real(iw)/10.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 5.0 nm from 123 to 163 nm:
+            ! define wavelength intervals of width 5.0 nm from 123 to 163 nm:
 
-      wincr = 5.0
-      DO iw = 123, 158, 5
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 5.0
+            DO iw = 123, 158, 5
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 2.0 nm from 163 to 175 nm:
+            ! define wavelength intervals of width 2.0 nm from 163 to 175 nm:
 
-      wincr = 2.0
-      DO iw = 163, 173, 2
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 2.0
+            DO iw = 163, 173, 2
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 0.5 nm from 175 to 205 nm:
+            ! define wavelength intervals of width 0.5 nm from 175 to 205 nm:
 
-      wincr = 0.5
-      DO iw = 1750, 2045, 5
-        kw = kw + 1
-        wl(kw) = real(iw)/10.
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 0.5
+            DO iw = 1750, 2045, 5
+            kw = kw + 1
+            wl(kw) = real(iw)/10.
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 5.0 nm from 205 to 245 nm:
+            ! define wavelength intervals of width 5.0 nm from 205 to 245 nm:
 
-      wincr = 5.
-      DO iw = 205, 240, 5
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 5.
+            DO iw = 205, 240, 5
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 10.0 nm from 245 to 415 nm:
+            ! define wavelength intervals of width 10.0 nm from 245 to 415 nm:
 
-      wincr = 10.0
-      DO iw = 245, 405, 10
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 10.0
+            DO iw = 245, 405, 10
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-! define wavelength intervals of width 50.0 nm from 415 to 815 nm:
+            ! define wavelength intervals of width 50.0 nm from 415 to 815 nm:
 
-      wincr = 50.0
-      DO iw = 415, 815, 50
-        kw = kw + 1
-        wl(kw) = real(iw)
-        wu(kw) = wl(kw) + wincr
-        wc(kw) = (wl(kw) + wu(kw))/2.
-      ENDDO
+            wincr = 50.0
+            DO iw = 415, 815, 50
+            kw = kw + 1
+            wl(kw) = real(iw)
+            wu(kw) = wl(kw) + wincr
+            wc(kw) = (wl(kw) + wu(kw))/2.
+            ENDDO
 
-      wl(kw+1) = wu(kw)
+            wl(kw+1) = wu(kw)
 
       end if  ! mopt
 
@@ -445,29 +499,30 @@ contains
 
 !==============================================================================
 
-      subroutine rdsolarflux(nw,wl,wc,f)
+      subroutine rdsolarflux(nw,wl,wc,msun,f)
 
 !     Read and re-grid solar flux data.
 
-!      use datafile_mod, only: datadir
+      ! select desired extra-terrestrial solar irradiance, using msun:
+
+      ! 18 = atlas3_thuillier_tuv.txt  0-900 nm  November 1994
+      !      Thuillier et al., Adv. Space. Res., 34, 256-261, 2004
 
       implicit none
 
-!#include "datafile.h"
-
 !     input
 
-      integer :: nw      ! number of wavelength grid points
-      real, dimension(nw) :: wl, wc   ! lower and central wavelength for each interval
+      integer, intent(in) :: nw                ! number of wavelength grid points
+      real, intent(in) :: wl(nw), wc(nw)       ! lower and central wavelength for each interval
+      integer, optional :: msun                !choice of solar flux
 
 !     output
 
-      real, dimension(nw) :: f  ! solar flux (w.m-2.nm-1)
+      real, intent(out) :: f(nw)  ! solar flux (w.m-2.nm-1)
 
 !     local
 
       integer, parameter :: kdata = 20000    ! max dimension of input solar flux
-      integer :: msun   ! choice of solar flux
       integer :: iw, nhead, ihead, n, i, ierr, kin
 
       real, parameter :: deltax = 1.e-4
@@ -478,12 +533,6 @@ contains
 
       kin = 10    ! input logical unit
 
-! select desired extra-terrestrial solar irradiance, using msun:
-
-! 18 = atlas3_thuillier_tuv.txt  0-900 nm  November 1994
-!      Thuillier et al., Adv. Space. Res., 34, 256-261, 2004
-
-      msun = 18
 
       if (msun == 18) THEN
 

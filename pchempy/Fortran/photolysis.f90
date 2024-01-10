@@ -13,21 +13,23 @@ MODULE photolysis
     7, 2, 3, 1, 25, 44, 8, 10/)          !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
 
     integer, parameter, dimension(19) :: isoID_phot_inc = (/&
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &  !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2
-    2, &                             !13C - CO2
-    2, 3, 2, 2, 2, 2, 3, 3/)         !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, &     !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2
+    2, &                                !13C - CO2
+    2, 3, 2, 2, 2, 2, 3, 3/)            !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
 
     !Number of reactions associated with each photolysis
-    !integer, parameter, dimension(11) :: n_phot_inc = (/&
-    !2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 2/)  !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2,(13C)O2
+    integer, parameter, dimension(19) :: n_phot_inc = (/&
+    2, 2, 2, 1, 1, 1, 1, 1, 1, 1, &    !O2,CO2,O3,H2O,H2O2,HO2,H2,NO,NO2,N2,
+    2, &                               !13C - CO2
+    2, 2, 2, 1, 1, 1, 1, 1/)           !18O - O2,CO2,O3,H2O,H2O2,HO2,NO,NO2
 
     CONTAINS
 
 !==============================================================================================================================================
 
     subroutine photolysis_online(nlay, ngas, ngas_phot, gasID, isoID, gasID_phot, isoID_phot, &
-        h, T, cdens, sza, tau, dist_sun, &
-        n_phot, rtype, ns, sID, sISO, sf, npr, pID, pISO, pf, rrates)
+        h, T, cdens, sza, tau, dist_sun, n_phot, &
+        rtype, ns, sID, sISO, sf, npr, pID, pISO, pf, rrates)
 
         ! Function to calculate the photolysis rates of a given set of reactions
 
@@ -62,6 +64,8 @@ MODULE photolysis
         integer :: j_18h2o,j_18h2o2,j_18ho2_1,j_18ho2_2
         integer :: j_no,j_no2,j_n2
         integer :: j_18no,j_18no2_1,j_18no2_2
+        integer :: mopt
+        logical :: xsloaded
         double precision :: colincg(nlay,ngas),vmr(nlay,ngas),colinc(nlay)
         real, dimension(nlay,nw,ngas_phot) :: dtgas
         real, dimension(nlay,nw,n_phot) :: sj
@@ -96,7 +100,10 @@ MODULE photolysis
         !reading all the cross sections for the different species
         !####################################################################
 
-        call init_photolysis(ngas_phot,gasID_phot,isoID_phot)
+        mopt = 1
+
+        xsloaded = allocated(wc)   !Flag to see if arrays have been already allocated (i.e. read)
+        if(xsloaded .eqv. .false.) call init_photolysis(ngas_phot,gasID_phot,isoID_phot,mopt)
 
         !Converting the column densities to cm-2 and calculating the mixing ratios
         !####################################################################
@@ -504,6 +511,8 @@ MODULE photolysis
 
         if(n_phot1.ne.n_phot)then
             print*,'error in photolysis_online. n_phot1 is not equal to n_phot'
+            print*,'n_phot1 = ',n_phot1
+            print*,'n_phot = ',n_phot
             stop
         endif
 
@@ -584,7 +593,6 @@ MODULE photolysis
         end do ! iw
 
         !eliminate small values
-
         where (rrates(:,1:n_phot) < 1.e-30)
             rrates(:,1:n_phot) = 0.d0
         end where
@@ -2110,7 +2118,7 @@ MODULE photolysis
         sf(1,j_no) = 1.0
 
         npr(j_no) = 2
-        pID(1,j_no) = 134  !N
+        pID(1,j_no) = 47   !N
         pISO(1,j_no) = 0
         pf(1,j_no) = 1.0
         pID(2,j_no) = 45   !O
@@ -2180,7 +2188,7 @@ MODULE photolysis
         sf(1,j_18no) = 1.0
 
         npr(j_18no) = 2
-        pID(1,j_18no) = 134  !N
+        pID(1,j_18no) = 47   !N
         pISO(1,j_18no) = 0
         pf(1,j_18no) = 1.0
         pID(2,j_18no) = 45   !O
@@ -2250,7 +2258,7 @@ MODULE photolysis
         sf(1,j_n2) = 1.0
 
         npr(j_n2) = 1
-        pID(1,j_n2) = 134  !N
+        pID(1,j_n2) = 47  !N
         pISO(1,j_n2) = 0
         pf(1,j_n2) = 2.0
 
