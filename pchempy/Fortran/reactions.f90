@@ -46,16 +46,19 @@ CONTAINS
         !       O + O2 + CO2 -> O3 + CO2
         !==========================================================================================
 
+        !co2/n2 efficiency as a third body = 2.075
+
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh                           
+        real, intent(in) :: t(nh)    
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
         rrates(:) = 2.075*6.0e-34*(t(:)/300.)**(-2.4)*dens(:)
@@ -88,15 +91,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
         rrates(:) = 2.5*9.46e-34*exp(485./t(:))*dens(:) ! nist expression
@@ -127,18 +131,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 8.0d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 2060.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 8.0e-12*exp(-2060./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -155,32 +166,39 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 2.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
 
     end subroutine reaction0003
 
     !**********************************************************************************************
     !O(1D) + CO2 -> O + CO2
-    subroutine reaction0004(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+    subroutine reaction0004(nh,p,t,co2,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
         !       O(1D) + CO2  -> O + CO2
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),co2(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 7.5d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -115.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 7.5e-11*exp(115./t(:)) * dens(:)
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:)) * co2(:)
 
         rtype = 1
 
@@ -194,7 +212,7 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
 
     end subroutine reaction0004
@@ -208,18 +226,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.63d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -60.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.63e-10*exp(60./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -236,7 +261,7 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 2.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
 
     end subroutine reaction0005
@@ -250,18 +275,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.2d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.2e-10
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -281,31 +313,38 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0006
 
     !**********************************************************************************************
     !O(1D) + O2 -> O + O2
-    subroutine reaction0007(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+    subroutine reaction0007(nh,p,t,o2,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
         !       O(1D) + O2  -> O + O2
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),o2(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 3.3d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -55.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 3.3e-11*exp(55./t(:)) * dens(:)
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:)) * o2(:)
 
         rtype = 1
 
@@ -319,7 +358,7 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0007
 
@@ -332,18 +371,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh 
+        real, intent(in) :: t(nh)                                
+        double precision, intent(in) :: p(nh),dens(nh)  
+        
+        !Local
+        double precision, parameter :: alpha = 2.4d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 0.5d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.2e-10
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -360,7 +406,7 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 2.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0008
 
@@ -373,18 +419,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh 
+        real, intent(in) :: t(nh)                                
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.4d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 0.5d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.2e-10
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -404,7 +457,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 2.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0009
 
@@ -417,18 +470,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)   
+        
+        !Local
+        double precision, parameter :: alpha = 3.0d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -200.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 3.0e-11*exp(200./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -448,7 +508,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0010
 
@@ -461,18 +521,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)   
+        
+        !Local
+        double precision, parameter :: alpha = 1.8d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -180.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.8e-11*exp(180./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -492,7 +559,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0011
 
@@ -505,18 +572,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.4d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 470.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.4e-10*exp(-470./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -536,7 +610,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0012
 
@@ -549,18 +623,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 7.2d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 7.2e-11
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -577,7 +658,7 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 2.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0013
 
@@ -590,18 +671,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)  
+        
+        !Local
+        double precision, parameter :: alpha = 6.9d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 6.9e-12
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -621,7 +709,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0014
 
@@ -634,18 +722,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),dens(nh)   
+
+        !Local
+        double precision, parameter :: alpha = 1.6d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.6e-12
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -665,7 +760,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0015
 
@@ -678,18 +773,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 4.8d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -250.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 4.8e-11*exp(250./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -709,7 +811,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0016
 
@@ -722,18 +824,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 3.0d-13
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -460.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 3.0e-13*exp(460./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 2
 
@@ -750,7 +859,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2015'
+        ref = 'JPL 2020'
 
     end subroutine reaction0017
 
@@ -763,18 +872,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh      
+        real, intent(in) :: t(nh)                           
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.8d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 1.8e-12
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -794,7 +910,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0018
 
@@ -807,18 +923,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh     
+        real, intent(in) :: t(nh)                            
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.8d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 1800.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-        rrates(:) = 2.8e-12*exp(-1800./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -838,7 +961,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0019
 
@@ -851,32 +974,38 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: ih
-        double precision :: ak0,ak1,xpo
+        double precision :: k0x,kinfx,kf
+        double precision, parameter :: k0 = 5.3d-32
+        double precision, parameter :: n = 1.8
+        double precision, parameter :: kinf = 9.5d-11
+        double precision, parameter :: m = -0.4
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
+        do ih=1,nh
 
-        do ih = 1,nh
-            !ak0 = 3.1*2.4*4.4e-32*(t(ilev)/300.)**(-1.3) ! FL li et al 2017
-            ak0 = 2.4*4.4e-32*(t(ih)/300.)**(-1.3)
-            ak1 = 7.5e-11*(t(ih)/300.)**(0.2)
+            !k0x = 2.4*4.4e-32*(t(ilev)/300.)**(-1.3) ! FL li et al 2017
+            k0x = 2.4*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
             
-            rate = (ak0*dens(ih))/(1. + ak0*dens(ih)/ak1)
-            xpo = 1./(1. + dlog10((ak0*dens(ih))/ak1)**2)
-            rrates(ih) = rate*0.6**xpo
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            rrates(ih) = kf
+            
         end do
-
 
         rtype = 3
 
@@ -893,7 +1022,8 @@ CONTAINS
         pISO(1) = 0
         pf(1) = 1.0
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
+
 
     end subroutine reaction0020
 
@@ -906,19 +1036,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)  
+        
+        !Local
+        double precision, parameter :: alpha = 1.4d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 2000.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 1.4e-12*exp(-2000./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -938,7 +1074,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0021
 
@@ -951,19 +1087,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.8d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 1.8e-12
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 2
 
@@ -980,7 +1122,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0022
 
@@ -993,19 +1135,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.7d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 940.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 1.7e-12*exp(-940./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -1025,7 +1173,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0023
 
@@ -1038,19 +1186,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh     
+        real, intent(in) :: t(nh)                            
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.0d-14
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 490.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 1.0e-14*exp(-490./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -1070,7 +1224,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 2.0
 
-        ref = 'JPL 2003'
+        ref = 'JPL 2020'
 
     end subroutine reaction0024
 
@@ -1083,19 +1237,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.1d-33
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -920.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 2.5*2.1e-33*exp(920./t(:))*dens(:)
+        rrates(:) = 2.5 * alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:)) * dens(:)
 
         rtype = 2
 
@@ -1112,7 +1272,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0025
 
@@ -1125,30 +1285,37 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
-        double precision :: ak0,ak1,rate,xpo
         integer :: ih
+        double precision :: k0x,kinfx,kf
+        double precision, parameter :: k0 = 6.9d-31
+        double precision, parameter :: n = 1.0
+        double precision, parameter :: kinf = 2.6d-11
+        double precision, parameter :: m = 0.0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
+         do ih=1,nh
 
-        do ih = 1,nh
-            ak0 = 2.5*6.9e-31*(t(ih)/300.)**(-1.0)
-            ak1 = 2.6e-11*(t(ih)/300.)**(0.0)
-   
-            rate = (ak0*dens(ih))/(1. + ak0*dens(ih)/ak1)
-            xpo = 1./(1. + dlog10((ak0*dens(ih))/ak1)**2)
-            rrates(ih) = rate*0.6**xpo
-         end do
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            rrates(ih) = kf
+            
+        end do
 
          rtype = 2
 
@@ -1162,8 +1329,8 @@ CONTAINS
          pISO(1) = 0
          pf(1) = 1.0
 
-        ref = 'JPL 2003'
-
+        ref = 'JPL 2020'
+        
     end subroutine reaction0026
 
     !**********************************************************************************************
@@ -1175,15 +1342,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1206,35 +1374,67 @@ CONTAINS
     end subroutine reaction0027
 
     !**********************************************************************************************
-    !NO2 + O -> NO + O2
+    !O + NO2 + M -> NO + O2 + M
     subroutine reaction0028(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
-        !       NO2 + O -> NO + O2
+        !       O + NO2 + M -> NO + NO + M
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: ih
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 3.4d-31
+        double precision, parameter :: n = 1.6
+        double precision, parameter :: kinf = 2.3d-11
+        double precision, parameter :: m = 0.2
+        double precision, parameter :: A = 5.3d-12
+        double precision, parameter :: B = -200.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
-        rrates(:) = 5.1e-12*exp(210./t(:))
+        do ih=1,nh
+
+            !association (NO3)
+            
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            !chemical activation (NO + O2)
+            
+            kint = A*exp(-B/t(ih))
+            kca = kint*(1.d0 - kf/kinf)
+            
+            !total : chemical activation
+            
+            rrates(ih) = kca
+            
+        end do
+
+        !rrates(:) = 5.1e-12*exp(210./t(:)) #JPL-2006
 
         rtype = 3
-    
+
         ns = 2
-        sID(1) = 10
+        sID(1) = 45
         sISO(1) = 0
         sf(1) = 1.0
-        sID(2) = 45
+        sID(2) = 10
         sISO(2) = 0
         sf(2) = 1.0
 
@@ -1246,7 +1446,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'JPL 2006'
+        ref = 'JPL 2020'
 
     end subroutine reaction0028
 
@@ -1259,19 +1459,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh         
+        real, intent(in) :: t(nh)                        
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 3.0d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 1500.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 3.0e-12*exp(-1500./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
     
@@ -1304,19 +1510,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 3.44d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -260.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 3.3e-12*exp(270./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
     
@@ -1349,19 +1561,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh  
+        real, intent(in) :: t(nh)                               
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.1d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -100.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 2.1e-11*exp(100./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
     
@@ -1382,7 +1600,7 @@ CONTAINS
         pf(2) = 1.0
 
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0031
 
@@ -1395,19 +1613,25 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 3.3d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 3150.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 1.5e-11*exp(-3600./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
 
         rtype = 3
 
@@ -1428,7 +1652,7 @@ CONTAINS
         pf(2) = 1.0
 
 
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0032
 
@@ -1441,19 +1665,26 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.35d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = 4.0e-10*exp(-340./t(:))
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+        !rrates(:) = 4.0e-10*exp(-340./t(:)) 
 
         rtype = 3
     
@@ -1473,8 +1704,7 @@ CONTAINS
         pISO(2) = 0
         pf(2) = 1.0
 
-
-        ref = 'JPL 2011'
+        ref = 'JPL 2020'
 
     end subroutine reaction0033
 
@@ -1487,15 +1717,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh     
+        real, intent(in) :: t(nh)                            
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1530,15 +1761,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh       
+        real, intent(in) :: t(nh)                          
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1576,15 +1808,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1622,15 +1855,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),o(nh)    
+        integer, intent(in) :: nh       
+        real, intent(in) :: t(nh)                          
+        double precision, intent(in) :: p(nh),o(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1662,15 +1896,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),n2(nh)    
+        integer, intent(in) :: nh 
+        real, intent(in) :: t(nh)                                
+        double precision, intent(in) :: p(nh),n2(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1702,15 +1937,16 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1748,41 +1984,47 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: ih
-        double precision :: k0,kinf,kf,kint,kca
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 6.9d-33
+        double precision, parameter :: n = 2.1
+        double precision, parameter :: kinf = 1.1d-12
+        double precision, parameter :: m = -1.3
+        double precision, parameter :: A = 1.85d-13
+        double precision, parameter :: B = 65.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
         do ih=1,nh
 
-            !association
+            !association (HOCO)
             
-            k0 = 2.5*6.9d-33*(298./t(ih))**(2.1)
-            kinf = 1.1d-12*(298./t(ih))**(-1.3)
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
             
-            kf = (kinf*k0*dens(ih)/(kinf + k0*dens(ih)))  &
-                *0.6**(1. + (log10(k0*dens(ih)/kinf))**2.)**(-1.0)
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
             
-            !chemical activation
+            !chemical activation (CO2 + H)
             
-            kint = 1.85e-13*exp(-65./t(ih))
-            
+            kint = A*exp(-B/t(ih))
             kca = kint*(1.d0 - kf/kinf)
             
-            !total : association + chemical activation
+            !total : chemical activation
             
-            rrates(ih) = kf + kca
+            rrates(ih) = kca
             
         end do
 
@@ -1805,28 +2047,101 @@ CONTAINS
         pf(2) = 1.0
 
 
-        ref = 'JPL 2019'
+        ref = 'JPL 2020'
 
     end subroutine reaction0040
 
     !**********************************************************************************************
-    !O + CO + M -> CO2 + M
+    !OH + CO -> HOCO
     subroutine reaction0041(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
-        !       O + CO + M -> CO2 + M
+        !       OH + CO -> HOCO
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: ih
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 6.9d-33
+        double precision, parameter :: n = 2.1
+        double precision, parameter :: kinf = 1.1d-12
+        double precision, parameter :: m = -1.3
+        double precision, parameter :: A = 1.85d-13
+        double precision, parameter :: B = 65.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+
+        do ih=1,nh
+
+            !association (HOCO)
+            
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            !chemical activation (CO2 + H)
+            
+            kint = A*exp(-B/t(ih))
+            kca = kint*(1.d0 - kf/kinf)
+            
+            !total : chemical activation
+            
+            rrates(ih) = kf
+            
+        end do
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 13
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 5
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 1
+        pID(1) = 80
+        pISO(1) = 0
+        pf(1) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0041
+
+    !**********************************************************************************************
+    !O + CO + M -> CO2 + M
+    subroutine reaction0042(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O + CO + M -> CO2 + M
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh    
+        real, intent(in) :: t(nh)                             
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -1850,946 +2165,659 @@ CONTAINS
 
         ref = 'tsang and hampson, 1986'
 
-    end subroutine reaction0041
-
-    !**********************************************************************************************
-    !C + H -> CH
-    subroutine reaction0042(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !       C + H -> CH
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        double precision,  parameter :: alpha = 1.0d-17
-        double precision,  parameter :: beta = 0.d0
-        double precision,  parameter :: gamma = 0.d0
-
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 46
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 48
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 1
-        pID(1) = 93
-        pISO(1) = 0
-        pf(1) = 1.0
-
-
-        ref = 'UMIST RATE12'
-
     end subroutine reaction0042
 
     !**********************************************************************************************
-    !C + N -> CN
+    !O(1D) + N2 + CO2 -> N2O + CO2
     subroutine reaction0043(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
-        !       C + N -> CN
+        !       O(1D) + N2 + M -> N2O + M
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
-        double precision,  parameter :: alpha = 5.72d-19
-        double precision,  parameter :: beta = 0.37
-        double precision,  parameter :: gamma = 51.
+        integer :: ih
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 2.8d-36
+        double precision, parameter :: n = 0.9
+        double precision, parameter :: kinf = 0.d0
+        double precision, parameter :: m = 0.d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-    
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 46
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 47
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 1
-        pID(1) = 96
-        pISO(1) = 0
-        pf(1) = 1.0
-
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0043
-
-    !**********************************************************************************************
-    !CH + H → H2 + C
-    subroutine reaction0044(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        CH + H → H2 + C
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        double precision,  parameter :: alpha = 1.31e-10
-        double precision,  parameter :: beta = 0.
-        double precision,  parameter :: gamma = 80.
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 48
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 39
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 46
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0044 
-
-    !**********************************************************************************************
-    !CH + N → CN + H
-    subroutine reaction0045(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        CH + N → CN + H
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        double precision,  parameter :: alpha = 1.66d-10
-        double precision,  parameter :: beta = -0.09
-        double precision,  parameter :: gamma = 0.0
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 47
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 96
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 48
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0045
-
-    !**********************************************************************************************
-    !CH + O → CO + H
-    subroutine reaction0046(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        CH + O → CO + H
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        double precision,  parameter :: alpha = 6.02d-11
-        double precision,  parameter :: beta = 0.10
-        double precision,  parameter :: gamma = -4.5
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 45
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 5
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 48
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0046
-
-    !**********************************************************************************************
-
-    !CH + O → OH + C
-    subroutine reaction0047(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        CH + O → OH + C
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        double precision,  parameter :: alpha = 2.52d-11
-        double precision,  parameter :: beta = 0.0
-        double precision,  parameter :: gamma = 2381.
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-        rrates(:) = alpha * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 45
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 13
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 46
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0047
-
-    !**********************************************************************************************
-
-    !NH + CN -> HCN + N
-    subroutine reaction0048(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        NH + CN -> HCN + N
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 2.94d-12 * (t(:)**(0.5)) * exp(-1000./t(:))
+        rrates(:) = 2.5*k0*(t(:)/300.)**(-n)*dens(:)
 
         rtype = 3
 
         ns = 2
-        sID(1) = 113
+        sID(1) = 133
         sISO(1) = 0
         sf(1) = 1.0
-        sID(2) = 96
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 23
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 47
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0048
-
-    !**********************************************************************************************
-
-    !O + CN → CO + N
-    subroutine reaction0049(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        O + CN → CO + N
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 5.00d-11 * (t(:)**(0.0)) * exp(-200./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 45
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 96
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 5
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 47
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0049
-
-    !**********************************************************************************************
-
-    !O + CN → NO + C
-    subroutine reaction0050(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        O + CN → NO + C
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 5.00d-11 * (t(:)**(0.0)) * exp(-200./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 45
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 96
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 8
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 46
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0050
-
-    !**********************************************************************************************
-
-    !CH + CO2 → HCO + CO
-    subroutine reaction0051(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        CH + CO2 → HCO + CO
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 2.94d-13 * (t(:)**(0.5)) * exp(-3000./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 2
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 81
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 5
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0051
-
-    !**********************************************************************************************
-
-    !H + CO2 → CO + OH
-    subroutine reaction0052(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        H + CO2 → CO + OH
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 3.38d-10 * (t(:)**(0.0)) * exp(-13163./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 48
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 2
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 5
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 13
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0052
-
-    !**********************************************************************************************
-
-    !N + CO2 → NO + CO
-    subroutine reaction0053(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        N + CO2 → NO + CO
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 3.2d-13 * (t(:)**(0.0)) * exp(-1710./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 47
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 2
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 8
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 5
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0053
-
-    !**********************************************************************************************
-
-    !O + CO2 → O2 + CO
-    subroutine reaction0054(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        O + CO2 → O2 + CO
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 2.46d-11 * (t(:)**(0.0)) * exp(-26567./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 45
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 2
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 7
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 5
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0054
-
-    !**********************************************************************************************
-
-    !H2 + C → CH + H
-    subroutine reaction0055(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        H2 + C → CH + H
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 6.64d-10 * (t(:)**(0.0)) * exp(-11700./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 39
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 46
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 93
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 48
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0055
-
-    !**********************************************************************************************
-
-    !H2 + O → OH + H
-    subroutine reaction0056(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        H2 + O → OH + H
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 3.14d-13 * (t(:)**(2.70)) * exp(-3150./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 39
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 45
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 13
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 48
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0056
-
-    !**********************************************************************************************
-
-    !H + H2O → OH + H2
-    subroutine reaction0057(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        H + H2O → OH + H2
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 1.59d-11 * (t(:)**(1.20)) * exp(-9610./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 48
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 1
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 13
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 39
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0057
-
-    !**********************************************************************************************
-
-    !O + H2O → OH + OH
-    subroutine reaction0058(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        O + H2O → OH + OH
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 1.85d-11 * (t(:)**(0.95)) * exp(-8571./t(:))
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 45
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 1
+        sID(2) = 22
         sISO(2) = 0
         sf(2) = 1.0
 
         npr = 1
-        pID(1) = 13
+        pID(1) = 4
+        pISO(1) = 0
+        pf(1) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0043
+
+    !**********************************************************************************************
+    !O + NO + CO2 -> NO2 + CO2
+    subroutine reaction0044(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O + NO + CO2 -> NO2 + CO2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: ih
+        double precision :: k0x,kinfx,kf
+        double precision, parameter :: k0 = 9.1d-32
+        double precision, parameter :: n = 1.5
+        double precision, parameter :: kinf = 3.0d-11
+        double precision, parameter :: m = 0.0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        do ih=1,nh
+
+            k0x = 2.4*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            rrates(ih) = kf
+            
+        end do
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 45
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 8
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 1
+        pID(1) = 10
+        pISO(1) = 0
+        pf(1) = 1.0
+
+        ref = 'JPL 2020'
+
+
+    end subroutine reaction0044
+
+    !**********************************************************************************************
+    !O(1D) + N2 -> O + N2
+    subroutine reaction0045(nh,p,t,n2,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O(1D) + N2 -> O(1D) + N2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),n2(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.5d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -110.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:)) * n2(:)
+
+        rtype = 1
+
+        ns = 1
+        sID(1) = 133
+        sISO(1) = 0
+        sf(1) = 1.0
+
+        npr = 1
+        pID(1) = 45
+        pISO(1) = 0
+        pf(1) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0045
+
+    !**********************************************************************************************
+    !O(1D) + N2O -> N2 + O2
+    subroutine reaction0046(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O(1D) + N2O -> N2 + O2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.19d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -20.d0
+        double precision, parameter :: br = 0.39d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 133
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 4
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 2
+        pID(1) = 22
+        pISO(1) = 0
+        pf(1) = 1.0
+        pID(2) = 7
+        pISO(2) = 0
+        pf(2) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0046
+
+    !**********************************************************************************************
+    !O(1D) + N2O -> NO + NO
+    subroutine reaction0047(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O(1D) + N2O -> NO + NO
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.19d-10
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -20.d0
+        double precision, parameter :: br = 0.61d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 133
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 4
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 1
+        pID(1) = 8
         pISO(1) = 0
         pf(1) = 2.0
 
-        ref = 'UMIST RATE12'
+        ref = 'JPL 2020'
 
-    end subroutine reaction0058
+    end subroutine reaction0047
 
     !**********************************************************************************************
-
-    !H + HCN → CN + H2
-    subroutine reaction0059(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+    !O + NO2 + M -> NO + O2 + M
+    subroutine reaction0048(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
-        !        H + HCN → CN + H2
+        !       O + NO2 + M -> NO + NO + M
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: ih
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 3.4d-31
+        double precision, parameter :: n = 1.6
+        double precision, parameter :: kinf = 2.3d-11
+        double precision, parameter :: m = 0.2
+        double precision, parameter :: A = 5.3d-12
+        double precision, parameter :: B = -200.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
-        rrates(:) = 6.2d-10 * (t(:)**(0.0)) * exp(-12500./t(:))
+        do ih=1,nh
+
+            !association (NO3)
+            
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            !chemical activation (NO + O2)
+            
+            kint = A*exp(-B/t(ih))
+            kca = kint*(1.d0 - kf/kinf)
+            
+            !total : chemical activation
+            
+            rrates(ih) = kca
+            
+        end do
 
         rtype = 3
 
-        ns = 3
-        sID(1) = 48
-        sISO(1) = 0
-        sf(1) = 1.0
-        sID(2) = 23
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 96
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 39
-        pISO(2) = 0
-        pf(2) = 1.0
-
-        ref = 'UMIST RATE12'
-
-    end subroutine reaction0059
-
-    !**********************************************************************************************
-
-    !O + HCN → CN + OH
-    subroutine reaction0060(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !        O + HCN → CN + OH
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-
-        rrates(:) = 6.21d-10 * (t(:)**(0.0)) * exp(-12439./t(:))
-
-        rtype = 3
-
-        ns = 3
+        ns = 2
         sID(1) = 45
         sISO(1) = 0
         sf(1) = 1.0
-        sID(2) = 23
+        sID(2) = 10
         sISO(2) = 0
         sf(2) = 1.0
 
         npr = 2
-        pID(1) = 96
+        pID(1) = 8
         pISO(1) = 0
         pf(1) = 1.0
-        pID(2) = 13
+        pID(2) = 7
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'UMIST RATE12'
+        ref = 'JPL 2020'
 
-    end subroutine reaction0060
+    end subroutine reaction0048
 
     !**********************************************************************************************
-
-    !O + HCN → CO + NH
-    subroutine reaction0061(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+    !O + NO2 + M -> NO3 + M
+    subroutine reaction0049(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
-        !        O + HCN → CO + NH
+        !       O + NO2 + M -> NO3 + M
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: ih
+        double precision :: k0x,kinfx,kf,kint,kca
+        double precision, parameter :: k0 = 3.4d-31
+        double precision, parameter :: n = 1.6
+        double precision, parameter :: kinf = 2.3d-11
+        double precision, parameter :: m = 0.2
+        double precision, parameter :: A = 5.3d-12
+        double precision, parameter :: B = -200.0d0
 
         !Outputs
         double precision, intent(out) :: rrates(nh)             
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
-        rrates(:) = 7.30d-13 * (t(:)**(1.14)) * exp(-3742./t(:))
+        do ih=1,nh
+
+            !association (NO3)
+            
+            k0x = 2.5*k0*(298./t(ih))**(n)
+            kinfx = kinf*(298./t(ih))**(m)
+            
+            kf = (kinfx*k0x*dens(ih)/(kinfx + k0x*dens(ih)))  &
+                *0.6**(1. + (log10(k0x*dens(ih)/kinfx))**2.)**(-1.0)
+            
+            !chemical activation (NO + O2)
+            
+            kint = A*exp(-B/t(ih))
+            kca = kint*(1.d0 - kf/kinf)
+            
+            !total : association
+            
+            rrates(ih) = kf
+            
+        end do
 
         rtype = 3
 
-        ns = 3
+        ns = 2
         sID(1) = 45
         sISO(1) = 0
         sf(1) = 1.0
-        sID(2) = 23
+        sID(2) = 10
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 1
+        pID(1) = 91
+        pISO(1) = 0
+        pf(1) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0049
+
+    !**********************************************************************************************
+    !O + NO3 -> O2 + NO2
+    subroutine reaction0050(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O + NO3 -> O2 + NO2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.3d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 45
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 91
         sISO(2) = 0
         sf(2) = 1.0
 
         npr = 2
-        pID(1) = 5
+        pID(1) = 8
         pISO(1) = 0
         pf(1) = 1.0
-        pID(2) = 113
+        pID(2) = 10
         pISO(2) = 0
         pf(2) = 1.0
 
-        ref = 'UMIST RATE12'
+        ref = 'JPL 2020'
 
-    end subroutine reaction0061
+    end subroutine reaction0050
+
+    !**********************************************************************************************
+    !N + NO2 -> N2O + O
+    subroutine reaction0051(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       N + NO2 -> N2O + O
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 5.8d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -220.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 47
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 10
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 2
+        pID(1) = 4
+        pISO(1) = 0
+        pf(1) = 1.0
+        pID(2) = 45
+        pISO(2) = 0
+        pf(2) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0051
+
+    !**********************************************************************************************
+    !NO + NO3 -> NO2 + NO2
+    subroutine reaction0052(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       NO + NO3 -> NO2 + NO2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.7d-11
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = -125.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 8
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 91
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 1
+        pID(1) = 10
+        pISO(1) = 0
+        pf(1) = 2.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0052
+
+    !**********************************************************************************************
+    !NO2 + O3 -> NO3 + O2
+    subroutine reaction0053(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       NO2 + O3 -> NO3 + O2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 1.2d-13
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 2450.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 10
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 3
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 2
+        pID(1) = 91
+        pISO(1) = 0
+        pf(1) = 1.0
+        pID(2) = 7
+        pISO(2) = 0
+        pf(2) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0053
+
+    !**********************************************************************************************
+    !NO3 + NO3 -> 2NO2 + O2
+    subroutine reaction0054(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       NO3 + NO3 -> 2NO2 + O2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 8.5d-13
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 2450.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 2
+
+        ns = 1
+        sID(1) = 91
+        sISO(1) = 0
+        sf(1) = 2.0
+
+        npr = 2
+        pID(1) = 10
+        pISO(1) = 0
+        pf(1) = 2.0
+        pID(2) = 7
+        pISO(2) = 0
+        pf(2) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0054
+
 
     !**********************************************************************************************
 
@@ -2811,12 +2839,14 @@ CONTAINS
         !we assume it is the same rate as reaction0039
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh       
+        real, intent(in) :: t(nh)                          
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
+        double precision :: rrates1(nh)
+        real :: sf1(2),pf1(2)
         character (len = 100) :: ref1
 
         !Outputs
@@ -2824,7 +2854,7 @@ CONTAINS
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -2873,12 +2903,14 @@ CONTAINS
         !k13 / k12 = 1.00638 - 1.693e-7*press(Pa) + 4.6968e-13 * press(Pa)**2.
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
+        double precision :: rrates1(nh)
+        real :: sf1(2),pf1(2)
         character (len = 100) :: ref1
 
         !Outputs
@@ -2886,7 +2918,7 @@ CONTAINS
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
@@ -2919,8 +2951,74 @@ CONTAINS
     end subroutine reaction0040_13c
 
     !**********************************************************************************************
-    !O + (13C)O + M -> (13C)O2 + M
+    !OH + (13C)O -> HO(13C)O
     subroutine reaction0041_13c(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       OH + (13C)O -> (13C)O2 + H
+        !==========================================================================================
+
+        !Assumed to be the same as e001, but with a 
+        !fractionation factor from Stevens et al. (1980)
+
+        !A polynomial function is fit to capture the pressure-
+        !dependence of the fractionation
+
+        !k13 / k12 = 1.00638 - 1.693e-5*press(hPa) + 4.6968e-9 * press(hPa)**2.
+        !k13 / k12 = 1.00638 - 1.693e-7*press(Pa) + 4.6968e-13 * press(Pa)**2.
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
+        double precision :: rrates1(nh)
+        real :: sf1(2),pf1(2)
+        character (len = 100) :: ref1
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+
+        !Calling reaction r0041 to get reaction rate for oh + co -> hoco
+        call reaction0041(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
+
+        rrates(:) = rrates1(:)*(1.00638 - 1.693e-7*p(:) + 4.6968e-13*p(:)**2.)
+
+        rtype = 3
+    
+        ns = 2
+        sID(1) = 13
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 5
+        sISO(2) = 2
+        sf(2) = 1.0
+
+        npr = 2
+        pID(1) = 2
+        pISO(1) = 2
+        pf(1) = 1.0
+        pID(2) = 48
+        pISO(2) = 0
+        pf(2) = 1.0
+
+
+        ref = 'Stevens et al. (1980)'
+
+    end subroutine reaction0041_13c
+
+
+    !**********************************************************************************************
+    !O + (13C)O + M -> (13C)O2 + M
+    subroutine reaction0042_13c(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
 
         !==========================================================================================
         !       O + (13C)O + M -> (13C)O2 + M
@@ -2929,12 +3027,14 @@ CONTAINS
         !we assume it is the same rate as reaction0041
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh 
+        real, intent(in) :: t(nh)                                
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
+        double precision :: rrates1(nh)
+        real :: sf1(2),pf1(2)
         character (len = 100) :: ref1
 
         !Outputs
@@ -2942,12 +3042,12 @@ CONTAINS
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
 
-        !Calling reaction r0041 to get reaction rate
-        call reaction0041(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
+        !Calling reaction r0042 to get reaction rate
+        call reaction0042(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
 
         rrates(:) = rrates1(:)*1.0
 
@@ -2968,162 +3068,8 @@ CONTAINS
 
         ref = 'N/A'
 
-    end subroutine reaction0041_13c
-
-    !**********************************************************************************************
-    !(13C) + H -> (13C)H
-    subroutine reaction0042_13c(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !       (13C) + H -> (13C)H
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
-        character (len = 100) :: ref1
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-        !Calling reaction r0042 to get reaction rate
-        call reaction0042(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
-
-        rrates(:) = rrates1(:)*1.0
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 46
-        sISO(1) = 2
-        sf(1) = 1.0
-        sID(2) = 48
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 1
-        pID(1) = 93
-        pISO(1) = 3
-        pf(1) = 1.0
-
-
-        ref = 'N/A'
-
     end subroutine reaction0042_13c
 
-    !**********************************************************************************************
-    !(13C) + N -> (13C)N
-    subroutine reaction0043_13c(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !       (13C) + N -> (13C)N
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
-        character (len = 100) :: ref1
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-        !Calling reaction r0043 to get reaction rate
-        call reaction0043(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
-
-        rrates(:) = rrates1(:)*1.0
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 46
-        sISO(1) = 2
-        sf(1) = 1.0
-        sID(2) = 47
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 1
-        pID(1) = 96
-        pISO(1) = 2
-        pf(1) = 1.0
-
-
-        ref = 'N/A'
-
-    end subroutine reaction0043_13c
-
-    !**********************************************************************************************
-    !(13C)H + H → H2 + (13C)
-    subroutine reaction0044_13c(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
-
-        !==========================================================================================
-        !       (13C)H + H → H2 + (13C)
-        !==========================================================================================
-
-        !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
-
-        !Local
-        integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
-        character (len = 100) :: ref1
-
-        !Outputs
-        double precision, intent(out) :: rrates(nh)             
-        integer, intent(out) :: rtype
-        integer, intent(out) :: ns,sID(2),sISO(2)
-        integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
-        character (len = 100) :: ref
-
-        !Calling reaction r0043 to get reaction rate
-        call reaction0044(nh,p,t,dens,rrates1,rtype1,ns1,sID1,sISO1,sf1,npr1,pID1,pISO1,pf1,ref1)
-
-        rrates(:) = rrates1(:)*1.0
-
-        rtype = 3
-
-        ns = 3
-        sID(1) = 93
-        sISO(1) = 3
-        sf(1) = 1.0
-        sID(2) = 48
-        sISO(2) = 0
-        sf(2) = 1.0
-
-        npr = 2
-        pID(1) = 39
-        pISO(1) = 0
-        pf(1) = 1.0
-        pID(2) = 46
-        pISO(2) = 2
-        pf(2) = 1.0
-
-
-        ref = 'N/A'
-
-    end subroutine reaction0044_13c
-
-    !**********************************************************************************************
 
 
 
@@ -3144,12 +3090,14 @@ CONTAINS
         !==========================================================================================
 
         !Inputs
-        integer, intent(in) :: nh                               
-        double precision, intent(in) :: p(nh),t(nh),dens(nh)    
+        integer, intent(in) :: nh           
+        real, intent(in) :: t(nh)                    
+        double precision, intent(in) :: p(nh),dens(nh)    
 
         !Local
         integer :: rtype1,ns1,npr1,sID1(2),sISO1(2),pID1(2),pISO1(2)
-        double precision :: sf1(2),pf1(2),rrates1(nh)
+        double precision :: rrates1(nh)
+        real :: sf1(2),pf1(2)
         character (len = 100) :: ref1
 
         !Outputs
@@ -3157,7 +3105,7 @@ CONTAINS
         integer, intent(out) :: rtype
         integer, intent(out) :: ns,sID(2),sISO(2)
         integer, intent(out) :: npr,pID(2),pISO(2)
-        double precision, intent(out) :: sf(2),pf(2)
+        real, intent(out) :: sf(2),pf(2)
         character (len = 100) :: ref
 
         !Calling reaction r0029 to get reaction rate
