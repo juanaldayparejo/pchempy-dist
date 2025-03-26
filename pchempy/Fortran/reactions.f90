@@ -2818,6 +2818,58 @@ CONTAINS
 
     end subroutine reaction0054
 
+    !**********************************************************************************************
+    !O2 + HOCO -> HO2 + CO2
+    subroutine reaction0055(nh,p,t,dens,rrates,rtype,ns,sID,sISO,sf,npr,pID,pISO,pf,ref)
+
+        !==========================================================================================
+        !       O2 + HOCO -> HO2 + CO2
+        !==========================================================================================
+
+        !Inputs
+        integer, intent(in) :: nh   
+        real, intent(in) :: t(nh)                              
+        double precision, intent(in) :: p(nh),dens(nh)    
+
+        !Local
+        double precision, parameter :: alpha = 2.0d-12
+        double precision, parameter :: beta = 0.d0
+        double precision, parameter :: gamma = 0.d0
+        double precision, parameter :: br = 1.0d0
+
+        !Outputs
+        double precision, intent(out) :: rrates(nh)             
+        integer, intent(out) :: rtype
+        integer, intent(out) :: ns,sID(2),sISO(2)
+        integer, intent(out) :: npr,pID(2),pISO(2)
+        real, intent(out) :: sf(2),pf(2)
+        character (len = 100) :: ref
+
+        rrates(:) = alpha * br * ((t(:)/300.d0)**beta) * dexp(-gamma/t(:))
+
+        rtype = 3
+
+        ns = 2
+        sID(1) = 7
+        sISO(1) = 0
+        sf(1) = 1.0
+        sID(2) = 80
+        sISO(2) = 0
+        sf(2) = 1.0
+
+        npr = 2
+        pID(1) = 44
+        pISO(1) = 0
+        pf(1) = 1.0
+        pID(2) = 2
+        pISO(2) = 0
+        pf(2) = 1.0
+
+        ref = 'JPL 2020'
+
+    end subroutine reaction0055
+
+
 
     !**********************************************************************************************
 

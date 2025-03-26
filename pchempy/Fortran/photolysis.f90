@@ -2576,14 +2576,14 @@ MODULE photolysis
     
         !     input:
     
-        integer :: nlev, nw
+        integer, intent(in) :: nlev, nw
     
-        real, dimension(nw)   :: wl, wc             
-        double precision, dimension(nlev) :: colinc
+        real, intent(in)   :: wl(nw), wc(nw)             
+        double precision, intent(in) :: colinc(nlev)
     
         !     output:
             
-        real, dimension(nlev,nw) :: dtrl  
+        real, intent(out) :: dtrl(nlev,nw)  
     
         !     local:
     
@@ -2743,8 +2743,8 @@ MODULE photolysis
 
         ! output
 
-        INTEGER nid(0:nlev)
-        REAL dsdh(0:nlev,nlev)
+        INTEGER, intent(out) :: nid(0:nlev)
+        REAL, intent(out) :: dsdh(0:nlev,nlev)
 
         ! more program constants
 
@@ -2851,20 +2851,20 @@ MODULE photolysis
         ! input
 
         integer, intent(in) :: nlev, nw, iw              
-        REAL ag
-        REAL zen
-        REAL dsdh(0:nlev,nlev)
-        INTEGER nid(0:nlev)
+        REAL, intent(in) :: ag
+        REAL, intent(in) :: zen
+        REAL, intent(in) :: dsdh(0:nlev,nlev)
+        INTEGER, intent(in) :: nid(0:nlev)
 
-        REAL dtrl(nlev,nw)
-        REAL dagas(nlev,nw)
-        REAL dtcld(nlev,nw), omcld(nlev,nw), gcld(nlev,nw)
-        REAL dtaer(nlev,nw), omaer(nlev,nw), gaer(nlev,nw)
+        REAL, intent(in) :: dtrl(nlev,nw)
+        REAL, intent(in) :: dagas(nlev,nw)
+        REAL, intent(in) :: dtcld(nlev,nw), omcld(nlev,nw), gcld(nlev,nw)
+        REAL, intent(in) :: dtaer(nlev,nw), omaer(nlev,nw), gaer(nlev,nw)
 
         ! output
 
-        REAL edir(nlev), edn(nlev), eup(nlev)
-        REAL fdir(nlev), fdn(nlev), fup(nlev)
+        REAL, intent(out) :: edir(nlev), edn(nlev), eup(nlev)
+        REAL, intent(out) :: fdir(nlev), fdn(nlev), fup(nlev)
 
         ! local:
 
@@ -2915,6 +2915,10 @@ MODULE photolysis
             g(ii) = (gcld(i,iw)*dscld + &
                         gaer(i,iw)*dsaer)/dtsct
         end do
+
+        print*,dt
+        print*,om
+        print*,g
 
         !     call rt routine:
 
@@ -2984,17 +2988,17 @@ MODULE photolysis
 
         ! input:
 
-        INTEGER nlev
-        REAL zen, rsfc
-        REAL tauu(nlev), omu(nlev), gu(nlev)
-        REAL dsdh(0:nlev,nlev)
-        INTEGER nid(0:nlev)
-        LOGICAL delta
+        INTEGER, intent(in) :: nlev
+        REAL, intent(in) :: zen, rsfc
+        REAL, intent(in) :: tauu(nlev), omu(nlev), gu(nlev)
+        REAL, intent(in) :: dsdh(0:nlev,nlev)
+        INTEGER, intent(in) :: nid(0:nlev)
+        LOGICAL, intent(in) :: delta
 
         ! output:
 
-        REAL fup(nlev),fdn(nlev),fdr(nlev)
-        REAL eup(nlev),edn(nlev),edr(nlev)
+        REAL, intent(out) :: fup(nlev),fdn(nlev),fdr(nlev)
+        REAL, intent(out) :: eup(nlev),edn(nlev),edr(nlev)
 
         ! local:
 
@@ -3416,6 +3420,7 @@ MODULE photolysis
         REAL bet, gam
         DIMENSION gam(n)
         !_______________________________________________________________________
+
 
         IF (b(1) .EQ. 0.) STOP 1001
         bet   = b(1)
