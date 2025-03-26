@@ -25,6 +25,12 @@ file_lines :: Read the number of lines in a file
 
 '''
 
+######################################################################################
+
+def pchempy_path():
+    import os
+    pchempy_path = os.path.join(os.path.dirname(os.path.realpath(__file__)),'../')
+    return pchempy_path
 
 ######################################################################################
 
@@ -577,3 +583,6 @@ def file_lines(fname):
         for i, l in enumerate(f):
             pass
     return i + 1
+
+
+    
