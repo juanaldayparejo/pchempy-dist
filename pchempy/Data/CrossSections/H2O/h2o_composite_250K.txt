@@ -1,29 +1,28 @@
-sections efficaces de H2O version 10 juin 2008
-
-114.80-139.90:
-
-R. Mota, R. Parafita, A. Giuliani, M.-J. Hubin-Franskin, J.M.C. Lourenço, 
-G. Garcia, S.V. Hoffmann, M.J. Mason, P.A. Ribeiro, M. Raposo, and P. Limão-Vieira, 
-"Water VUV electronic state spectroscopy by synchrotron radiation," 
-Chem. Phys. Lett. 416, 152-159 (2005).
-
-140.00-189.00:
-
-C.-Y. Chung, E. P. Chew, B.-M. Cheng, M. Bahou, and Y.-P. Lee, 
-"Temperature dependence of absorption cross-section of H2O, HDO, 
-and D2O in the spectral region 140-193 nm", 
-Nucl. Instr. Meth. Phys. Res. A 467-468, 1572-1576 (2001).
-valeurs à 250K
-
-190.00-196.00:
-valeurs de Chung et al. (2001) à 295K réduites de 15% 
-(dépendance en température observée à 190 nm)
-
-197.00-200.00:
-
-extrapolation vers la valeur de Thompson et al. (1963)
-réduite de 15%.
-===================================================================================
+#sections efficaces de H2O version 10 juin 2008
+#114.80-139.90:
+#
+#R. Mota, R. Parafita, A. Giuliani, M.-J. Hubin-Franskin, J.M.C. Lourenï¿½o, 
+#G. Garcia, S.V. Hoffmann, M.J. Mason, P.A. Ribeiro, M. Raposo, and P. Limï¿½o-Vieira, 
+#"Water VUV electronic state spectroscopy by synchrotron radiation," 
+#Chem. Phys. Lett. 416, 152-159 (2005).
+#
+#140.00-189.00:
+#
+#C.-Y. Chung, E. P. Chew, B.-M. Cheng, M. Bahou, and Y.-P. Lee, 
+#"Temperature dependence of absorption cross-section of H2O, HDO, 
+#and D2O in the spectral region 140-193 nm", 
+#Nucl. Instr. Meth. Phys. Res. A 467-468, 1572-1576 (2001).
+#valeurs ï¿½ 250K
+#
+#190.00-196.00:
+#valeurs de Chung et al. (2001) ï¿½ 295K rï¿½duites de 15% 
+#(dï¿½pendance en tempï¿½rature observï¿½e ï¿½ 190 nm)
+#
+#197.00-200.00:
+#
+#extrapolation vers la valeur de Thompson et al. (1963)
+#rï¿½duite de 15%.
+#===================================================================================
 114.80    3.818443e-18
 114.85    4.233199e-18
 114.90    4.341790e-18

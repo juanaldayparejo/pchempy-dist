@@ -1,14 +1,14 @@
-section efficace de co2 a 370 k 
-
-0.15406  - 106.1091 nm: huestis and berkowitz (2010)
-106.1116 - 118.7030 nm: starck et al. (2006) 295 k
-120.     - 197.25   nm: lewis and carver (1983) 370 k
-197.5    - 210.     nm: extrapolation
-
-
-
-lambda (nm) sec. eff. (cm2)
-===========================
+#section efficace de co2 a 370 k 
+#
+#0.15406  - 106.1091 nm: huestis and berkowitz (2010)
+#106.1116 - 118.7030 nm: starck et al. (2006) 295 k
+#120.     - 197.25   nm: lewis and carver (1983) 370 k
+#197.5    - 210.     nm: extrapolation
+#
+#
+#
+#lambda (nm) sec. eff. (cm2)
+#===========================
 0.15406   6.670e-22
 0.16579   8.440e-22
 0.17890   1.071e-21

@@ -15,5 +15,5 @@ phys_const = {
     'c_p': 14300,                    # J K-1 hydrogen specific heat
     'h': 6.62607,                    # Js Planck's constant
     'hbar': 1.05457,                 # Js
-    'N_A': 6.02214e23,               # Avagadro's number
+    'N_A': 6.02214e23,               # Avagadro's number (mol-1)
 }

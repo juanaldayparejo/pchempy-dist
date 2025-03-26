@@ -1,14 +1,14 @@
-section efficace de co2 a 195 k
-
-0.15406  - 106.1466 nm: huestis and berkowitz (2010) 
-106.1509 - 117.8070 nm: starck et al. (2006) 195 k
-117.8086 - 163.3702 nm: yoshino et al. (1996) 195 k
-163.3730 - 192.4881 nm: parkinson et al. (2003) 195 k, corrige de rayleigh
-192.4897 - 199.8884 nm: parkinson et al. (2003) 295 k, corrige de rayleigh, *facteur 0.4 
-200.25   - 210.     nm: extrapolation
-
-lambda (nm) sec. eff. (cm2)
-==========================
+#section efficace de co2 a 195 k
+#
+#0.15406  - 106.1466 nm: huestis and berkowitz (2010) 
+#106.1509 - 117.8070 nm: starck et al. (2006) 195 k
+#117.8086 - 163.3702 nm: yoshino et al. (1996) 195 k
+#163.3730 - 192.4881 nm: parkinson et al. (2003) 195 k, corrige de rayleigh
+#192.4897 - 199.8884 nm: parkinson et al. (2003) 295 k, corrige de rayleigh, *facteur 0.4 
+#200.25   - 210.     nm: extrapolation
+#
+#lambda (nm) sec. eff. (cm2)
+#==========================
 0.15406   6.670e-22
 0.16579   8.440e-22
 0.17890   1.071e-21

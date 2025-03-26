@@ -1,14 +1,14 @@
-section efficace de co2 a 295 k
-
-0.15406  - 106.1091 nm: huestis and berkowitz (2010)
-106.1116 - 118.7030 nm: starck et al. (2006) 295 k
-118.7395 - 163.3693 nm: yoshino et al. (1996) 295 k
-163.3728 - 199.9884 nm: parkinson et al. (2003) 295 k, corrige de rayleigh
-200.25   - 210.     nm: extrapolation
-
-
-lambda (nm) sec. eff. (cm2)
-==========================
+#section efficace de co2 a 295 k
+#
+#0.15406  - 106.1091 nm: huestis and berkowitz (2010)
+#106.1116 - 118.7030 nm: starck et al. (2006) 295 k
+#118.7395 - 163.3693 nm: yoshino et al. (1996) 295 k
+#163.3728 - 199.9884 nm: parkinson et al. (2003) 295 k, corrige de rayleigh
+#200.25   - 210.     nm: extrapolation
+#
+#
+#lambda (nm) sec. eff. (cm2)
+#==========================
 0.15406   6.670e-22
 0.16579   8.440e-22
 0.17890   1.071e-21

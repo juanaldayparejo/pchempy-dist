@@ -14,6 +14,7 @@ planet_const = {
 
     'Mars':{
         'Radius': 3397.2e3,              # Mars radius (m)
+        'Mass': 6.4169e23,               #Mass (kg)
         'daytosec': 88775.,              # Length of a day (s)
         'rotrate': 2.0*np.pi/88775.,     # Rotation rate (rad s-1)
         'g0': 3.72,                      # Gravity at the surface (m s-2)
